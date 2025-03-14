@@ -39,5 +39,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sugardarius/konpo.git"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
   }
 }
