@@ -26,6 +26,13 @@
     "README.md",
     "LICENSE"
   ],
+  "author": {
+    "name": "SugarDarius"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sugardarius/konpo.git"
+  },
   "scripts": {
     "build:dev": "tsup --watch",
     "build:prod": "tsup --minify",
@@ -35,10 +42,6 @@
   },
   "peerDependencies": {
     "react": "^18 || ^19"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sugardarius/konpo.git"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
