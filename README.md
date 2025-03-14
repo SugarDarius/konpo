@@ -1,1 +1,1 @@
-A fast, unstyled, and composable comment composer React composer.
+A fast, unstyled, and composable comment composer React component.
