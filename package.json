@@ -41,6 +41,7 @@
     "url": "git+https://github.com/sugardarius/konpo.git"
   },
   "devDependencies": {
+    "@types/node": "^22.13.10",
     "typescript": "^5.8.2"
   }
 }
