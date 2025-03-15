@@ -1,1 +1,1 @@
-export {}
+export type { ComposerRootProps } from './types'
