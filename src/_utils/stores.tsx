@@ -2,9 +2,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useDebugValue,
-  useEffect,
   useState,
+  useSyncExternalStore,
   type PropsWithChildren,
 } from 'react'
 
@@ -14,6 +13,7 @@ export type Store<T extends object> = {
   subscribe: (subscriber: (state: T) => void) => () => void
 }
 
+/** Create and returns getter, setter and subscriber */
 export function createStore<T extends object>(
   createInitialState: (set: Store<T>['set'], get: Store<T>['get']) => T
 ): Store<T> {
@@ -62,12 +62,14 @@ export function createStore<T extends object>(
   return { get, set, subscribe }
 }
 
+/** Create a store with a given initial state. */
 export function useCreateStore<T extends object>(createStore: () => Store<T>) {
   const [store] = useState(createStore)
 
   return store
 }
 
+/** Create a store context and provider. */
 export function useCreateStoreContext<T extends object>(
   missingProviderError?: string
 ) {
@@ -93,34 +95,21 @@ export function useCreateStoreContext<T extends object>(
   return { useStore, Provider }
 }
 
+/** Run a selector against the store state. */
 export function useSelector<T extends object, S>(
   store: Store<T>,
-  selector: (state: T) => S,
-  compare: (a: S, b: S) => boolean = Object.is
+  selector: (state: T) => S
 ) {
-  const [slice, setSlice] = useState(() => selector(store.get()))
-
-  useEffect(() => {
-    return store.subscribe(() => {
-      const nextSlice = selector(store.get())
-
-      setSlice((previousSlice) =>
-        compare(previousSlice, nextSlice) ? previousSlice : nextSlice
-      )
-    })
-  }, [store, selector, compare])
-
-  useDebugValue(slice)
-
-  return slice
+  const cb = () => selector(store.get())
+  return useSyncExternalStore(store.subscribe, cb, cb)
 }
 
+/** Get a key from the store based on a key */
 export function useSelectorKey<T extends object, K extends keyof T>(
   store: Store<T>,
-  key: K,
-  compare?: (a: T[K], b: T[K]) => boolean
+  key: K
 ) {
   const selector = useCallback((state: T) => state[key], [key])
 
-  return useSelector(store, selector, compare)
+  return useSelector(store, selector)
 }
