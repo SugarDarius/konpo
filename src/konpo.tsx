@@ -15,6 +15,7 @@ import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
 import { KonpoEditorEditable, KonpoEditorWrapper } from './editor'
+import { useInitial } from './_hooks/use-initial'
 
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   (
@@ -51,7 +52,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
-    const initialValue = useSelectorKey(store, 'initialValue')
+    const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
 
     return (
       <KonpoEditorWrapper
