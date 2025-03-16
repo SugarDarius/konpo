@@ -17,6 +17,7 @@ import {
 export type KonpoStore = {
   editor: KonpoEditor
   disabled: boolean
+  focused: boolean
   canSubmit: boolean
   initialValue: KonpoEditorDescendant[]
   assert: () => void
@@ -36,6 +37,7 @@ export function createKonpoStore({
   return createStore<KonpoStore>((set, get) => ({
     editor: createKonpoEditor(),
     disabled,
+    focused: false,
     canSubmit: false,
     initialValue: initialValue ? toKonpoEditorDescendants(initialValue) : [],
     assert: (): void => {

@@ -136,14 +136,32 @@ const ComposerEditorPlaceholder = ({
  * ```
  */
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
-  ({ dir, placeholder, ...props }, forwardedRef) => {
+  ({ dir, placeholder, onFocus, onBlur, ...props }, forwardedRef) => {
     const store = useKonpoStore()
 
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
+    const focused = useSelectorKey(store, 'focused')
+
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
 
     const handleChange = useStableCallback(useSelectorKey(store, 'assert'))
+    const handleFocus = useStableCallback(
+      (e: React.FocusEvent<HTMLDivElement>) => {
+        onFocus?.(e)
+        if (!e.isDefaultPrevented()) {
+          store.set({ focused: true })
+        }
+      }
+    )
+    const handleBlur = useStableCallback(
+      (e: React.FocusEvent<HTMLDivElement>) => {
+        onBlur?.(e)
+        if (!e.isDefaultPrevented()) {
+          store.set({ focused: false })
+        }
+      }
+    )
 
     const renderElement = useStableCallback(
       (props: KonpoEditorEditableRenderElementProps) => {
@@ -174,6 +192,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           ref={forwardedRef}
           konpo-editable=''
           data-disabled={disabled}
+          data-focused={focused}
           dir={dir}
           readOnly={disabled}
           disabled={disabled}
@@ -181,6 +200,8 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           renderPlaceholder={renderPlaceholder}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
       </KonpoEditorWrapper>
     )
