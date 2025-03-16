@@ -18,6 +18,7 @@ import {
   KonpoEditorEditable,
   KonpoEditorWrapper,
   type KonpoEditorEditableRenderElementProps,
+  type KonpoEditorEditableRenderLeafProps,
 } from './editor'
 import { useInitial } from './_hooks/use-initial'
 
@@ -50,10 +51,11 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   }
 )
 
-const ComposerEditorElement = (
-  props: KonpoEditorEditableRenderElementProps
-) => {
-  const { element, attributes, children } = props
+const ComposerEditorElement = ({
+  element,
+  attributes,
+  children,
+}: KonpoEditorEditableRenderElementProps) => {
   switch (element.type) {
     case 'paragraph':
       return (
@@ -64,6 +66,36 @@ const ComposerEditorElement = (
     default:
       return null
   }
+}
+
+/**
+ * Renders a leaf of the editor follow this schema 👇🏻
+ * <code><s><em><strong>{element.text}</strong></s></em></code>
+ */
+const ComposerEditorLeaf = ({
+  leaf,
+  attributes,
+  children,
+}: KonpoEditorEditableRenderLeafProps) => {
+  let content = children
+  if (leaf.bold) {
+    content = <strong>{content}</strong>
+  }
+  if (leaf.italic) {
+    content = <em>{content}</em>
+  }
+  if (leaf.strikethrough) {
+    content = <s>{content}</s>
+  }
+  if (leaf.code) {
+    content = <code>{content}</code>
+  }
+
+  return (
+    <Primitive.span {...attributes} konpo-span=''>
+      {content}
+    </Primitive.span>
+  )
 }
 
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
@@ -77,6 +109,12 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     const renderElement = useStableCallback(
       (props: KonpoEditorEditableRenderElementProps) => {
         return <ComposerEditorElement {...props} />
+      }
+    )
+
+    const renderLeaf = useStableCallback(
+      (props: KonpoEditorEditableRenderLeafProps) => {
+        return <ComposerEditorLeaf {...props} />
       }
     )
 
@@ -96,6 +134,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           disabled={disabled}
           placeholder={placeholder}
           renderElement={renderElement}
+          renderLeaf={renderLeaf}
         />
         <Slottable>{children}</Slottable>
       </KonpoEditorWrapper>
