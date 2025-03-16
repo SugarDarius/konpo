@@ -15,6 +15,7 @@ import {
   Editable,
   type RenderLeafProps,
   type RenderPlaceholderProps,
+  ReactEditor as SlateReactEditor,
 } from 'slate-react'
 
 import { exists } from './_utils/identity'
@@ -179,4 +180,8 @@ export function clearKonpoEditor(editor: KonpoEditor): void {
       focus: SlateEditor.end(editor, []),
     },
   })
+}
+
+export function blurKonpoEditor(editor: KonpoEditor): void {
+  SlateReactEditor.blur(editor)
 }

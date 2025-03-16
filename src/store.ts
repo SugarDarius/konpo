@@ -5,6 +5,7 @@ import {
 } from './_utils/create-store'
 import type { ComposerRootProps, KonpoComposedBody } from './types'
 import {
+  blurKonpoEditor,
   clearKonpoEditor,
   createKonpoEditor,
   isKonpoEditorEmpty,
@@ -22,6 +23,7 @@ export type KonpoStore = {
   initialValue: KonpoEditorDescendant[]
   assert: () => void
   clear: () => void
+  blur: () => void
   onSubmit: () => void
 }
 
@@ -54,6 +56,10 @@ export function createKonpoStore({
 
       set({ canSubmit: false })
     },
+    blur: (): void => {
+      const editor = get().editor
+      blurKonpoEditor(editor)
+    },
     onSubmit: (): void => {
       const editor = get().editor
 
@@ -66,6 +72,7 @@ export function createKonpoStore({
       onSubmit(body)
 
       get().clear()
+      get().blur()
     },
   }))
 }
