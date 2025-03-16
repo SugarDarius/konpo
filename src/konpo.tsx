@@ -19,6 +19,7 @@ import {
   KonpoEditorWrapper,
   type KonpoEditorEditableRenderElementProps,
   type KonpoEditorEditableRenderLeafProps,
+  type KonpoEditorEditableRenderPlaceholderProps,
 } from './editor'
 import { useInitial } from './_hooks/use-initial'
 
@@ -92,8 +93,19 @@ const ComposerEditorLeaf = ({
   }
 
   return (
-    <Primitive.span {...attributes} konpo-span=''>
+    <Primitive.span {...attributes} konpo-inline=''>
       {content}
+    </Primitive.span>
+  )
+}
+
+const ComposerEditorPlaceholder = ({
+  attributes,
+  children,
+}: KonpoEditorEditableRenderPlaceholderProps) => {
+  return (
+    <Primitive.span {...attributes} konpo-placeholder=''>
+      {children}
     </Primitive.span>
   )
 }
@@ -118,6 +130,12 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
       }
     )
 
+    const renderPlaceholder = useStableCallback(
+      (props: KonpoEditorEditableRenderPlaceholderProps) => {
+        return <ComposerEditorPlaceholder {...props} />
+      }
+    )
+
     return (
       <KonpoEditorWrapper
         editor={editor}
@@ -135,6 +153,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           placeholder={placeholder}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
+          renderPlaceholder={renderPlaceholder}
         />
         <Slottable>{children}</Slottable>
       </KonpoEditorWrapper>

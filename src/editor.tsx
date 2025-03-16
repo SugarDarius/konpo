@@ -12,6 +12,7 @@ import {
   Slate,
   Editable,
   type RenderLeafProps,
+  type RenderPlaceholderProps,
 } from 'slate-react'
 
 import { exists } from './_utils/exists'
@@ -63,6 +64,10 @@ export interface KonpoEditorEditableRenderElementProps
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KonpoEditorEditableRenderLeafProps extends RenderLeafProps {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface KonpoEditorEditableRenderPlaceholderProps
+  extends RenderPlaceholderProps {}
 
 const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
   inline.text !== undefined && typeof inline.text === 'string'
