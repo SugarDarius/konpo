@@ -2,7 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
-  useState,
+  useMemo,
   useSyncExternalStore,
   type PropsWithChildren,
 } from 'react'
@@ -62,11 +62,9 @@ export function createStore<T extends object>(
   return { get, set, subscribe }
 }
 
-/** Create a store with a given initial state. */
+/** Create a store with a given initial state only once. */
 export function useCreateStore<T extends object>(createStore: () => Store<T>) {
-  const [store] = useState(createStore)
-
-  return store
+  return useMemo(() => createStore(), [])
 }
 
 /** Create a store context and provider. */
@@ -75,14 +73,14 @@ export function useCreateStoreContext<T extends object>(
 ) {
   const Context = createContext<Store<T> | null>(null)
 
-  const useStore = () => {
+  const useStore = (): Store<T> => {
     const store = useContext(Context)
 
     if (!store) {
       throw new Error(missingProviderError)
     }
 
-    return store as Store<T>
+    return store
   }
 
   const Provider = ({
