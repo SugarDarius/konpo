@@ -1,3 +1,7 @@
+import { Editor as SlateEditor, createEditor } from 'slate'
+import { withHistory } from 'slate-history'
+import { withReact } from 'slate-react'
+
 import {
   createStore,
   useCreateStoreContext,
@@ -7,6 +11,7 @@ import type { ComposerRootProps } from './types'
 
 export type KonpoStore = {
   disabled: boolean
+  editor: SlateEditor
   onSubmit: () => void
 }
 
@@ -17,8 +22,10 @@ export function createKonpoStore({
   disabled: boolean
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
+  const editor = withHistory(withReact(createEditor()))
   return createStore<KonpoStore>(() => ({
     disabled,
+    editor,
     onSubmit: (): void => {
       // TODO: add some works
       onSubmit()
