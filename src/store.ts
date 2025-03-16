@@ -31,5 +31,5 @@ export function createKonpoStore({
 
 export const { useStore: useKonpoStore, Provider: KonpoStoreProvider } =
   useCreateStoreContext<KonpoStore>(
-    '<Composer.Root /> is missing. Did you forget to wrap your component with <Composer.Root>?'
+    '<Composer.Root /> is missing. Did you forget to wrap your component with <Composer.Root />?'
   )
