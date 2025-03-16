@@ -180,7 +180,7 @@ export function isKonpoEditorEmpty(
 // We can ignore these errors and log them in development 👇🏻
 export function clearKonpoEditor(editor: KonpoEditor): void {
   ignoreOnThrow(
-    "Failed to clear the editor, 'Composer' may be unmounted.",
+    "Failed to clear konpo editor, 'Composer' may be unmounted.",
     (): void => {
       SlateTransforms.delete(editor, {
         at: {
@@ -193,7 +193,7 @@ export function clearKonpoEditor(editor: KonpoEditor): void {
 }
 export function blurKonpoEditor(editor: KonpoEditor): void {
   ignoreOnThrow(
-    "Failed to blur the editor, 'Composer' may be unmounted.",
+    "Failed to blur konpo editor, 'Composer' may be unmounted.",
     (): void => {
       SlateReactEditor.blur(editor)
     }
@@ -204,7 +204,7 @@ export function focusKonpoEditor(
   resetSelection = true
 ): void {
   ignoreOnThrow(
-    "Failed to clear focus editor, 'Composer' may be unmounted.",
+    "Failed to clear konpo editor, 'Composer' may be unmounted.",
     (): void => {
       if (!SlateReactEditor.isFocused(editor)) {
         SlateTransforms.select(
