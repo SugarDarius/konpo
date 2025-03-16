@@ -17,7 +17,10 @@ import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
 import { KonpoEditorEditable, KonpoEditorWrapper } from './editor'
 
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
-  ({ onSubmit, disabled = false, children, ...props }, forwardedRef) => {
+  (
+    { onSubmit, disabled = false, initialValue, children, ...props },
+    forwardedRef
+  ) => {
     const onSubmitStable = useStableCallback(
       onSubmit ??
         createDevelopmentWarning(
@@ -28,6 +31,7 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
     const store = useCreateStore(() =>
       createKonpoStore({
         disabled,
+        initialValue,
         onSubmit: onSubmitStable,
       })
     )
@@ -47,9 +51,14 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
+    const initialValue = useSelectorKey(store, 'initialValue')
 
     return (
-      <KonpoEditorWrapper editor={editor} initialValue={[]} onChange={() => {}}>
+      <KonpoEditorWrapper
+        editor={editor}
+        initialValue={initialValue}
+        onChange={() => {}}
+      >
         <KonpoEditorEditable
           {...props}
           ref={forwardedRef}

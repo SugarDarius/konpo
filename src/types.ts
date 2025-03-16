@@ -40,6 +40,10 @@ export interface ComposerRootProps
    * A callback that is called when the composer is submitted.
    */
   onSubmit?: (body: KonpoComposedBody) => void
+  /**
+   * Composer initial content.
+   */
+  initialValue?: KonpoComposedBody
 }
 
 export interface ComposerEditorProps extends DivProps, Children {

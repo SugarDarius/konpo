@@ -3,25 +3,34 @@ import {
   useCreateStoreContext,
   type Store,
 } from './_utils/create-store'
-import type { ComposerRootProps } from './types'
-import { createKonpoEditor, type KonpoEditor } from './editor'
+import type { ComposerRootProps, KonpoComposedBody } from './types'
+import {
+  createKonpoEditor,
+  toKonpoEditorDescendants,
+  type KonpoEditor,
+  type KonpoEditorDescendant,
+} from './editor'
 
 export type KonpoStore = {
-  disabled: boolean
   editor: KonpoEditor
+  disabled: boolean
+  initialValue: KonpoEditorDescendant[]
   onSubmit: () => void
 }
 
 export function createKonpoStore({
   disabled,
+  initialValue,
   onSubmit,
 }: {
   disabled: boolean
+  initialValue?: KonpoComposedBody
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>(() => ({
-    disabled,
     editor: createKonpoEditor(),
+    disabled,
+    initialValue: initialValue ? toKonpoEditorDescendants(initialValue) : [],
     onSubmit: (): void => {
       // TODO: add some transform operations here
       onSubmit({ content: [] })
