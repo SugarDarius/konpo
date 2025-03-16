@@ -122,7 +122,7 @@ const ComposerEditorPlaceholder = ({
 }
 
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
-  ({ dir, placeholder, children, ...props }, forwardedRef) => {
+  ({ dir, placeholder, ...props }, forwardedRef) => {
     const store = useKonpoStore()
 
     const editor = useSelectorKey(store, 'editor')
@@ -166,7 +166,6 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           renderLeaf={renderLeaf}
           renderPlaceholder={renderPlaceholder}
         />
-        <Slottable>{children}</Slottable>
       </KonpoEditorWrapper>
     )
   }

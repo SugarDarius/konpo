@@ -46,7 +46,7 @@ export interface ComposerRootProps
   initialValue?: KonpoComposedBody
 }
 
-export interface ComposerEditorProps extends DivProps, Children {
+export interface ComposerEditorProps extends DivProps {
   /**
    * Reading direction of the editor.
    */
