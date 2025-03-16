@@ -23,6 +23,17 @@ import {
 } from './editor'
 import { useInitial } from './_hooks/use-initial'
 
+/**
+ * Root of the composer.
+ *
+ * @example
+ * ```tsx
+ * <Composer.Root onSubmit={(body) => console.log(body)}>
+ *   <Composer.Editor placeholder='Write a message...' />
+ *   <Composer.SubmitButton>Send</Composer.SubmitButton>
+ * </Composer.Root>
+ * ```
+ */
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   (
     { onSubmit, disabled = false, initialValue, children, ...props },
