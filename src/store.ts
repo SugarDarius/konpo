@@ -7,7 +7,7 @@ import type { ComposerRootProps } from './types'
 
 export type KonpoStore = {
   disabled: boolean
-  onSubmit: NonNullable<ComposerRootProps['onSubmit']>
+  onSubmit: () => void
 }
 
 export function createKonpoStore({

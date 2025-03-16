@@ -55,16 +55,26 @@ const ComposerSubmitButton = forwardRef<
   ComposerSubmitButtonProps
 >(({ asChild, disabled, ...props }, forwardedRef) => {
   const store = useKonpoStore()
+
   const isComposerDisabled = useSelectorKey(store, 'disabled')
+  const onSubmit = useSelectorKey(store, 'onSubmit')
 
   const Comp = asChild ? Slot : Primitive.button
   const isDisabled = isComposerDisabled || disabled
+
+  const handleClick = useStableCallback(
+    (e: React.MouseEvent<HTMLButtonElement>): void => {
+      e.preventDefault()
+      onSubmit()
+    }
+  )
 
   return (
     <Comp
       {...props}
       ref={forwardedRef}
       disabled={isDisabled}
+      onClick={handleClick}
       konpo-submit-button=''
     />
   )
