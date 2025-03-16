@@ -59,7 +59,7 @@ export function createStore<T extends object>(
 
   state = createInitialState(set, get)
 
-  return { get, set, subscribe }
+  return { get, set, subscribe } as const
 }
 
 /** Create a store with a given initial state only once. */
@@ -90,7 +90,7 @@ export function useCreateStoreContext<T extends object>(
     return <Context.Provider value={store}>{children}</Context.Provider>
   }
 
-  return { useStore, Provider }
+  return { useStore, Provider } as const
 }
 
 /** Run a selector against the store state. */
