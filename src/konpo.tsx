@@ -145,7 +145,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
         <KonpoEditorEditable
           {...props}
           ref={forwardedRef}
-          konpo-editor=''
+          konpo-editable=''
           data-disabled={disabled}
           dir={dir}
           readOnly={disabled}
