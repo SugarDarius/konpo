@@ -1,8 +1,8 @@
 import { Primitive } from '@radix-ui/react-primitive'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export type Slot = { asChild?: boolean }
-export type Children = { children?: React.ReactNode }
+export type Children = { children?: ReactNode }
 
 export type DivProps = ComponentProps<typeof Primitive.div>
 export type ButtonProps = ComponentProps<typeof Primitive.button>
