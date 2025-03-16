@@ -1,6 +1,8 @@
 import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps, ReactNode } from 'react'
 
+export type Awaitable<T> = T | Promise<T>
+
 export type KonpoText = {
   bold?: boolean
   italic?: boolean
@@ -39,7 +41,7 @@ export interface ComposerRootProps
   /**
    * A callback that is called when the composer is submitted.
    */
-  onSubmit?: (body: KonpoComposedBody) => void
+  onSubmit?: (body: KonpoComposedBody) => Awaitable<void>
   /**
    * Composer initial content.
    */

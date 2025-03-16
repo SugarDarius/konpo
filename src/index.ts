@@ -1,4 +1,5 @@
 export type {
+  Awaitable,
   ComposerRootProps,
   ComposerEditorProps,
   ComposerSubmitButtonProps,

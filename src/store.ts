@@ -16,6 +16,7 @@ import {
   type KonpoEditor,
   type KonpoEditorDescendant,
 } from './editor'
+import { isPromise } from './_utils/promise'
 
 export type KonpoStore = {
   editor: KonpoEditor
@@ -80,11 +81,18 @@ export function createKonpoStore({
         return
       }
 
-      const body = toKonpoComposedBody(editor.children)
-      onSubmit(body)
+      const after = (): void => {
+        get().clear()
+        get().blur()
+      }
 
-      get().clear()
-      get().blur()
+      const body = toKonpoComposedBody(editor.children)
+      const maybePromise = onSubmit(body)
+      if (isPromise(maybePromise)) {
+        maybePromise.then(after)
+      }
+
+      after()
     },
   }))
 }
