@@ -19,7 +19,7 @@ export type KonpoParagraphElement = {
 export type KonpoBlockElement = KonpoParagraphElement
 export type KonpoComposedBody = {
   content: KonpoBlockElement[]
-  // TODO: add more properties
+  // TODO: add more properties if I feel the need to
 }
 
 export type Children = { children?: ReactNode }

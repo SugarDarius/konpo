@@ -50,9 +50,15 @@ export const KonpoEditorWrapper = (props: {
   children: React.ReactNode
 }) => <Slate {...props} />
 
-export const KonpoEditorEditable = (
-  props: React.ComponentProps<typeof Editable>
-) => <Editable {...props} />
+type KonpoEditorEditableProps = React.ComponentProps<typeof Editable>
+export const KonpoEditorEditable = (props: KonpoEditorEditableProps) => (
+  <Editable {...props} />
+)
+
+// TODO: add more properties like mentions, links, etc.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface KonpoEditorEditableRenderElementProps
+  extends RenderElementProps {}
 
 const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
   inline.text !== undefined && typeof inline.text === 'string'

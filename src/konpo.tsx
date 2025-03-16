@@ -14,7 +14,11 @@ import type {
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
-import { KonpoEditorEditable, KonpoEditorWrapper } from './editor'
+import {
+  KonpoEditorEditable,
+  KonpoEditorWrapper,
+  type KonpoEditorEditableRenderElementProps,
+} from './editor'
 import { useInitial } from './_hooks/use-initial'
 
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
@@ -46,6 +50,22 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   }
 )
 
+const ComposerEditorElement = (
+  props: KonpoEditorEditableRenderElementProps
+) => {
+  const { element, attributes, children } = props
+  switch (element.type) {
+    case 'paragraph':
+      return (
+        <Primitive.p {...attributes} konpo-paragraph=''>
+          {children}
+        </Primitive.p>
+      )
+    default:
+      return null
+  }
+}
+
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
   ({ dir, placeholder, children, ...props }, forwardedRef) => {
     const store = useKonpoStore()
@@ -53,6 +73,12 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
+
+    const renderElement = useStableCallback(
+      (props: KonpoEditorEditableRenderElementProps) => {
+        return <ComposerEditorElement {...props} />
+      }
+    )
 
     return (
       <KonpoEditorWrapper
@@ -69,6 +95,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           readOnly={disabled}
           disabled={disabled}
           placeholder={placeholder}
+          renderElement={renderElement}
         />
         <Slottable>{children}</Slottable>
       </KonpoEditorWrapper>
