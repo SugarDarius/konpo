@@ -4,6 +4,7 @@ import { forwardRef } from 'react'
 import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
 
+import { useLayoutEffect } from './_hooks/use-layout-effect'
 import { useStableCallback } from './_hooks/use-stable-callback'
 
 import type {
@@ -136,12 +137,16 @@ const ComposerEditorPlaceholder = ({
  * ```
  */
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
-  ({ dir, placeholder, onFocus, onBlur, ...props }, forwardedRef) => {
+  (
+    { dir, placeholder, autoFocus = false, onFocus, onBlur, ...props },
+    forwardedRef
+  ) => {
     const store = useKonpoStore()
 
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
     const focused = useSelectorKey(store, 'focused')
+    const focus = useStableCallback(useSelectorKey(store, 'focus'))
 
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
 
@@ -180,6 +185,12 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
         return <ComposerEditorPlaceholder {...props} />
       }
     )
+
+    useLayoutEffect(() => {
+      if (autoFocus) {
+        focus()
+      }
+    }, [autoFocus, focus])
 
     return (
       <KonpoEditorWrapper

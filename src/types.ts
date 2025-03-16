@@ -51,11 +51,14 @@ export interface ComposerEditorProps extends DivProps {
    * Reading direction of the editor.
    */
   dir?: Direction
-
   /**
    * Placeholder text when the editor is empty.
    */
   placeholder?: string
+  /**
+   * Autofocus editor when it mounts.
+   */
+  autoFocus?: boolean
 }
 
 export interface ComposerSubmitButtonProps extends ButtonProps, Children {

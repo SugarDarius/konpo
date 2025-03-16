@@ -185,3 +185,18 @@ export function clearKonpoEditor(editor: KonpoEditor): void {
 export function blurKonpoEditor(editor: KonpoEditor): void {
   SlateReactEditor.blur(editor)
 }
+
+export function focusKonpoEditor(
+  editor: KonpoEditor,
+  resetSelection = true
+): void {
+  if (!SlateReactEditor.isFocused(editor)) {
+    SlateTransforms.select(
+      editor,
+      resetSelection || !editor.selection
+        ? SlateEditor.end(editor, [])
+        : editor.selection
+    )
+    SlateReactEditor.focus(editor)
+  }
+}
