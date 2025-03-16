@@ -102,7 +102,7 @@ export function useSelector<T extends object, S>(
   return useSyncExternalStore(store.subscribe, cb, cb)
 }
 
-/** Get a key from the store based on a key */
+/** Get a property from the store based on a key */
 export function useSelectorKey<T extends object, K extends keyof T>(
   store: Store<T>,
   key: K
