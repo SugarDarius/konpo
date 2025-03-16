@@ -1,8 +1,11 @@
 import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps } from 'react'
 
+export type Slot = { asChild?: boolean }
 export type Children = { children?: React.ReactNode }
+
 export type DivProps = ComponentProps<typeof Primitive.div>
+export type ButtonProps = ComponentProps<typeof Primitive.button>
 
 export type Direction = 'ltr' | 'rtl'
 
@@ -17,7 +20,7 @@ export interface ComposerRootProps extends DivProps, Children {
   onSubmit?: () => void
 }
 
-export interface ComposerEditorProps extends DivProps {
+export interface ComposerEditorProps extends DivProps, Children {
   /**
    * Reading direction of the editor.
    */
@@ -28,3 +31,8 @@ export interface ComposerEditorProps extends DivProps {
    */
   placeholder?: string
 }
+
+export interface ComposerSubmitButtonProps
+  extends ButtonProps,
+    Slot,
+    Children {}
