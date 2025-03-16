@@ -169,21 +169,21 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     )
 
     const renderElement = useStableCallback(
-      (props: KonpoEditorEditableRenderElementProps) => {
-        return <ComposerEditorElement {...props} />
-      }
+      (props: KonpoEditorEditableRenderElementProps) => (
+        <ComposerEditorElement {...props} />
+      )
     )
 
     const renderLeaf = useStableCallback(
-      (props: KonpoEditorEditableRenderLeafProps) => {
-        return <ComposerEditorLeaf {...props} />
-      }
+      (props: KonpoEditorEditableRenderLeafProps) => (
+        <ComposerEditorLeaf {...props} />
+      )
     )
 
     const renderPlaceholder = useStableCallback(
-      (props: KonpoEditorEditableRenderPlaceholderProps) => {
-        return <ComposerEditorPlaceholder {...props} />
-      }
+      (props: KonpoEditorEditableRenderPlaceholderProps) => (
+        <ComposerEditorPlaceholder {...props} />
+      )
     )
 
     useLayoutEffect(() => {
