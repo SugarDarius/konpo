@@ -7,7 +7,7 @@
     "lib": ["dom", "es2024"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "types": ["react"],
+    "types": ["react", "node"],
     "noEmit": true,
     "esModuleInterop": true,
     "stripInternal": true,
