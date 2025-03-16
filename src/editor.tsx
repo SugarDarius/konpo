@@ -218,3 +218,11 @@ export function focusKonpoEditor(
     }
   )
 }
+export function selectKonpoEditor(editor: KonpoEditor): void {
+  ignoreOnThrow(
+    "Failed to select konpo editor, 'Composer' may be unmounted.",
+    (): void => {
+      SlateTransforms.select(editor, SlateEditor.end(editor, []))
+    }
+  )
+}

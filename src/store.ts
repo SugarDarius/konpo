@@ -10,6 +10,7 @@ import {
   createKonpoEditor,
   focusKonpoEditor,
   isKonpoEditorEmpty,
+  selectKonpoEditor,
   toKonpoComposedBody,
   toKonpoEditorDescendants,
   type KonpoEditor,
@@ -23,6 +24,7 @@ export type KonpoStore = {
   canSubmit: boolean
   initialValue: KonpoEditorDescendant[]
   focus: (resetSelection?: boolean) => void
+  select: () => void
   assert: () => void
   clear: () => void
   blur: () => void
@@ -44,6 +46,10 @@ export function createKonpoStore({
     focused: false,
     canSubmit: false,
     initialValue: initialValue ? toKonpoEditorDescendants(initialValue) : [],
+    select: (): void => {
+      const editor = get().editor
+      selectKonpoEditor(editor)
+    },
     focus: (resetSelection?: boolean): void => {
       const editor = get().editor
       focusKonpoEditor(editor, resetSelection)
