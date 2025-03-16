@@ -76,8 +76,8 @@ export function createKonpoStore({
     onSubmit: (): void => {
       const editor = get().editor
 
+      // Extra check to avoid submitting an empty body
       if (isKonpoEditorEmpty(editor, editor.children)) {
-        // No need to submit an empty body
         return
       }
 
