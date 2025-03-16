@@ -38,8 +38,10 @@
     "url": "git+https://github.com/sugardarius/konpo.git"
   },
   "scripts": {
-    "build:dev": "tsup --watch",
-    "build:prod": "tsup --minify",
+    "dev": "tsup --watch",
+    "build": "tsup --minify",
+    "dev:www": "turbo run dev --filter=www",
+    "build:www": "turbo run build --filter=www",
     "lint": "npm run lint:eslint && npm run lint:tsc",
     "lint:eslint": "eslint src/",
     "lint:tsc": "tsc --noEmit",
