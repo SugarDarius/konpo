@@ -46,7 +46,9 @@ export function createKonpoStore({
     disabled,
     focused: false,
     canSubmit: false,
-    initialValue: initialValue ? toKonpoEditorDescendants(initialValue) : [],
+    initialValue: initialValue
+      ? toKonpoEditorDescendants(initialValue)
+      : [{ type: 'paragraph', children: [{ text: '' }] }],
     select: (): void => {
       const editor = get().editor
       selectKonpoEditor(editor)
