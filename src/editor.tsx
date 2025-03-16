@@ -27,6 +27,7 @@ import type {
   KonpoComposedBody,
   KonpoBlockElement,
 } from './types'
+import { ignoreOnThrow } from './_utils/error'
 
 declare module 'slate' {
   interface CustomTypes {
@@ -173,30 +174,47 @@ export function isKonpoEditorEmpty(
   return true
 }
 
+// Slate's DOM-specific operations can throw errors
+// in case the editor's DOM node can no longer exists if the composer
+// is unmounted before the operation is completed.
+// We can ignore these errors and log them in development 👇🏻
 export function clearKonpoEditor(editor: KonpoEditor): void {
-  SlateTransforms.delete(editor, {
-    at: {
-      anchor: SlateEditor.start(editor, []),
-      focus: SlateEditor.end(editor, []),
-    },
-  })
+  ignoreOnThrow(
+    "Failed to clear the editor, 'Composer' may be unmounted.",
+    (): void => {
+      SlateTransforms.delete(editor, {
+        at: {
+          anchor: SlateEditor.start(editor, []),
+          focus: SlateEditor.end(editor, []),
+        },
+      })
+    }
+  )
 }
-
 export function blurKonpoEditor(editor: KonpoEditor): void {
-  SlateReactEditor.blur(editor)
+  ignoreOnThrow(
+    "Failed to blur the editor, 'Composer' may be unmounted.",
+    (): void => {
+      SlateReactEditor.blur(editor)
+    }
+  )
 }
-
 export function focusKonpoEditor(
   editor: KonpoEditor,
   resetSelection = true
 ): void {
-  if (!SlateReactEditor.isFocused(editor)) {
-    SlateTransforms.select(
-      editor,
-      resetSelection || !editor.selection
-        ? SlateEditor.end(editor, [])
-        : editor.selection
-    )
-    SlateReactEditor.focus(editor)
-  }
+  ignoreOnThrow(
+    "Failed to clear focus editor, 'Composer' may be unmounted.",
+    (): void => {
+      if (!SlateReactEditor.isFocused(editor)) {
+        SlateTransforms.select(
+          editor,
+          resetSelection || !editor.selection
+            ? SlateEditor.end(editor, [])
+            : editor.selection
+        )
+        SlateReactEditor.focus(editor)
+      }
+    }
+  )
 }
