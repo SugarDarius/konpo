@@ -2,6 +2,7 @@
 
 import { forwardRef } from 'react'
 import { Primitive } from '@radix-ui/react-primitive'
+import { Slottable } from '@radix-ui/react-slot'
 
 import { useStableCallback } from './_hooks/use-stable-callback'
 
@@ -26,7 +27,9 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
     )
     return (
       <Primitive.div ref={forwardedRef} {...props} konpo-root=''>
-        <KonpoStoreProvider store={store}>{children}</KonpoStoreProvider>
+        <KonpoStoreProvider store={store}>
+          <Slottable>{children}</Slottable>
+        </KonpoStoreProvider>
       </Primitive.div>
     )
   }
