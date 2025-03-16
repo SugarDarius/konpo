@@ -5,6 +5,7 @@ import {
 } from './_utils/create-store'
 import type { ComposerRootProps, KonpoComposedBody } from './types'
 import {
+  clearKonpoEditor,
   createKonpoEditor,
   isKonpoEditorEmpty,
   toKonpoComposedBody,
@@ -16,7 +17,9 @@ import {
 export type KonpoStore = {
   editor: KonpoEditor
   disabled: boolean
+  canSubmit: boolean
   initialValue: KonpoEditorDescendant[]
+  assert: () => void
   clear: () => void
   onSubmit: () => void
 }
@@ -30,11 +33,25 @@ export function createKonpoStore({
   initialValue?: KonpoComposedBody
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
-  return createStore<KonpoStore>((_set, get) => ({
+  return createStore<KonpoStore>((set, get) => ({
     editor: createKonpoEditor(),
     disabled,
+    canSubmit: false,
     initialValue: initialValue ? toKonpoEditorDescendants(initialValue) : [],
-    clear: (): void => {},
+    assert: (): void => {
+      const editor = get().editor
+      const disabled = get().disabled
+
+      const isEmpty = isKonpoEditorEmpty(editor, editor.children)
+
+      set({ canSubmit: !isEmpty && !disabled })
+    },
+    clear: (): void => {
+      const editor = get().editor
+      clearKonpoEditor(editor)
+
+      set({ canSubmit: false })
+    },
     onSubmit: (): void => {
       const editor = get().editor
 

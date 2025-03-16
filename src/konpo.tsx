@@ -24,7 +24,10 @@ import {
 import { useInitial } from './_hooks/use-initial'
 
 /**
- * Root of the composer.
+ * Adds the root of the composer.
+ *
+ * It will create a store to manage the state of the composer.
+ * This component is required to use the other components.
  *
  * @example
  * ```tsx
@@ -121,6 +124,17 @@ const ComposerEditorPlaceholder = ({
   )
 }
 
+/**
+ * Adds the composer's editor.
+ *
+ * This component is responsible for rendering the editor.
+ * It uses Slate's `Editable` component under the hood.
+ *
+ * @example
+ * ```tsx
+ * <Composer.Editor placeholder='Write a message...' />
+ * ```
+ */
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
   ({ dir, placeholder, ...props }, forwardedRef) => {
     const store = useKonpoStore()
@@ -128,6 +142,8 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
+
+    const handleChange = useStableCallback(useSelectorKey(store, 'assert'))
 
     const renderElement = useStableCallback(
       (props: KonpoEditorEditableRenderElementProps) => {
@@ -151,7 +167,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
       <KonpoEditorWrapper
         editor={editor}
         initialValue={initialValue}
-        onChange={() => {}}
+        onChange={handleChange}
       >
         <KonpoEditorEditable
           {...props}
@@ -171,6 +187,17 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
   }
 )
 
+/**
+ * Adds a submit button to the composer.
+ *
+ * It will be disabled if the composer is disabled or the editor is empty
+ * or you explicitly set the `disabled` prop.
+ *
+ * @example
+ * ```tsx
+ * <Composer.SubmitButton>Send</Composer.SubmitButton>
+ * ```
+ */
 const ComposerSubmitButton = forwardRef<
   HTMLButtonElement,
   ComposerSubmitButtonProps
@@ -178,10 +205,11 @@ const ComposerSubmitButton = forwardRef<
   const store = useKonpoStore()
 
   const isComposerDisabled = useSelectorKey(store, 'disabled')
+  const canComposerSubmit = useSelectorKey(store, 'canSubmit')
   const onSubmit = useSelectorKey(store, 'onSubmit')
 
   const Comp = asChild ? Slot : Primitive.button
-  const isDisabled = isComposerDisabled || disabled
+  const isDisabled = isComposerDisabled || disabled || !canComposerSubmit
 
   const handleClick = useStableCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
