@@ -23,8 +23,8 @@ export function createKonpoStore({
     disabled,
     editor: createKonpoEditor(),
     onSubmit: (): void => {
-      // TODO: add some works
-      onSubmit()
+      // TODO: add some transform operations here
+      onSubmit({ content: [] })
     },
   }))
 }

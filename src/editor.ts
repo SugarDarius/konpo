@@ -2,6 +2,7 @@ import {
   createEditor as createSlateEditor,
   type BaseEditor,
   type Element,
+  type Descendant,
 } from 'slate'
 import { withHistory, type HistoryEditor } from 'slate-history'
 import {
@@ -32,3 +33,4 @@ export function createKonpoEditor() {
 }
 
 export type KonpoEditor = ReturnType<typeof createKonpoEditor>
+export type KonpoEditorDescendant = Descendant

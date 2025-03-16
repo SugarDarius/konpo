@@ -14,6 +14,12 @@ export type KonpoParagraphElement = {
   children: KonpoInlineElement[]
 }
 
+export type KonpoBlockElement = KonpoParagraphElement
+export type KonpoComposedBody = {
+  content: KonpoBlockElement[]
+  // TODO: add more properties
+}
+
 export type Slot = { asChild?: boolean }
 export type Children = { children?: ReactNode }
 
@@ -22,7 +28,9 @@ export type ButtonProps = ComponentProps<typeof Primitive.button>
 
 export type Direction = 'ltr' | 'rtl'
 
-export interface ComposerRootProps extends DivProps, Children {
+export interface ComposerRootProps
+  extends Omit<DivProps, 'onSubmit'>,
+    Children {
   /**
    * Whether the composer is disabled.
    */
@@ -30,7 +38,7 @@ export interface ComposerRootProps extends DivProps, Children {
   /**
    * A callback that is called when the composer is submitted.
    */
-  onSubmit?: () => void
+  onSubmit?: (body: KonpoComposedBody) => void
 }
 
 export interface ComposerEditorProps extends DivProps, Children {
