@@ -12,7 +12,7 @@ import { useCreateStore } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider } from './store'
 
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
-  ({ onSubmit, children, ...props }, forwardedRef) => {
+  ({ onSubmit, disabled = false, children, ...props }, forwardedRef) => {
     const onSubmitStable = useStableCallback(
       onSubmit ??
         createDevelopmentWarning(
@@ -22,6 +22,7 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
 
     const store = useCreateStore(() =>
       createKonpoStore({
+        disabled,
         onSubmit: onSubmitStable,
       })
     )
