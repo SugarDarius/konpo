@@ -9,6 +9,8 @@ import {
   withReact,
   type ReactEditor,
   type RenderElementProps,
+  Slate,
+  Editable,
 } from 'slate-react'
 
 import type { KonpoParagraphElement, KonpoText } from './types'
@@ -34,3 +36,14 @@ export function createKonpoEditor() {
 
 export type KonpoEditor = ReturnType<typeof createKonpoEditor>
 export type KonpoEditorDescendant = Descendant
+
+export const KonpoEditorWrapper = (props: {
+  editor: KonpoEditor
+  initialValue: KonpoEditorDescendant[]
+  onChange: (value: KonpoEditorDescendant[]) => void
+  children: React.ReactNode
+}) => <Slate {...props} />
+
+export const KonpoEditorEditable = (
+  props: React.ComponentProps<typeof Editable>
+) => <Editable {...props} />

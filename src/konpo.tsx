@@ -14,6 +14,7 @@ import type {
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
+import { KonpoEditorEditable, KonpoEditorWrapper } from './editor'
 
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   ({ onSubmit, disabled = false, children, ...props }, forwardedRef) => {
@@ -42,10 +43,24 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
 
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
   ({ dir, placeholder, children, ...props }, forwardedRef) => {
+    const store = useKonpoStore()
+
+    const editor = useSelectorKey(store, 'editor')
+    const disabled = useSelectorKey(store, 'disabled')
+
     return (
-      <Primitive.div {...props} ref={forwardedRef} konpo-editor=''>
+      <KonpoEditorWrapper editor={editor} initialValue={[]} onChange={() => {}}>
+        <KonpoEditorEditable
+          {...props}
+          ref={forwardedRef}
+          data-disabled={disabled}
+          dir={dir}
+          readOnly={disabled}
+          disabled={disabled}
+          placeholder={placeholder}
+        />
         <Slottable>{children}</Slottable>
-      </Primitive.div>
+      </KonpoEditorWrapper>
     )
   }
 )

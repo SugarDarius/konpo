@@ -4,6 +4,8 @@ import type { ComponentProps, ReactNode } from 'react'
 export type KonpoText = {
   bold?: boolean
   italic?: boolean
+  strikethrough?: boolean
+  code?: boolean
   text: string
 }
 
@@ -20,7 +22,6 @@ export type KonpoComposedBody = {
   // TODO: add more properties
 }
 
-export type Slot = { asChild?: boolean }
 export type Children = { children?: ReactNode }
 
 export type DivProps = ComponentProps<typeof Primitive.div>
@@ -53,7 +54,6 @@ export interface ComposerEditorProps extends DivProps, Children {
   placeholder?: string
 }
 
-export interface ComposerSubmitButtonProps
-  extends ButtonProps,
-    Slot,
-    Children {}
+export interface ComposerSubmitButtonProps extends ButtonProps, Children {
+  // TODO: add keyboard shortcut to submit
+}
