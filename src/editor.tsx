@@ -13,7 +13,13 @@ import {
   Editable,
 } from 'slate-react'
 
-import type { KonpoParagraphElement, KonpoText } from './types'
+import { exists } from './_utils/exists'
+import type {
+  KonpoInlineElement,
+  KonpoParagraphElement,
+  KonpoText,
+  KonpoComposedBody,
+} from './types'
 
 declare module 'slate' {
   interface CustomTypes {
@@ -47,3 +53,37 @@ export const KonpoEditorWrapper = (props: {
 export const KonpoEditorEditable = (
   props: React.ComponentProps<typeof Editable>
 ) => <Editable {...props} />
+
+const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
+  inline.text !== undefined && typeof inline.text === 'string'
+
+export function toKonpoEditorDescendants(
+  body: KonpoComposedBody
+): KonpoEditorDescendant[] {
+  if (body.content.length <= 0) {
+    return []
+  }
+
+  return body.content
+    .map((block) => {
+      if (block.type !== 'paragraph') {
+        return null
+      }
+
+      const descendants = block.children
+        .map((inline) => {
+          if (isKonpoText(inline)) {
+            return inline
+          }
+
+          return null
+        })
+        .filter(exists)
+
+      return {
+        ...block,
+        descendants,
+      }
+    })
+    .filter(exists)
+}
