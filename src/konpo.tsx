@@ -4,16 +4,37 @@ import { forwardRef } from 'react'
 import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
 
+import type { BaseEditor, Element } from 'slate'
+import type { HistoryEditor } from 'slate-history'
+import type { ReactEditor, RenderElementProps } from 'slate-react'
+
 import { useStableCallback } from './_hooks/use-stable-callback'
 
 import type {
   ComposerRootProps,
   ComposerEditorProps,
   ComposerSubmitButtonProps,
+  KonpoParagraphElement,
+  KonpoText,
 } from './types'
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor & HistoryEditor
+    Element: KonpoParagraphElement
+    Text: KonpoText
+  }
+}
+
+declare module 'slate-react' {
+  type RenderElementSpecificProps<E extends Element> = Omit<
+    RenderElementProps,
+    'element'
+  > & { element: E }
+}
 
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   ({ onSubmit, disabled = false, children, ...props }, forwardedRef) => {

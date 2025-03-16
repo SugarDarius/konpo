@@ -1,6 +1,19 @@
 import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps, ReactNode } from 'react'
 
+export type KonpoText = {
+  bold?: boolean
+  italic?: boolean
+  text: string
+}
+
+export type KonpoInlineElement = KonpoText
+
+export type KonpoParagraphElement = {
+  type: 'paragraph'
+  children: KonpoInlineElement[]
+}
+
 export type Slot = { asChild?: boolean }
 export type Children = { children?: ReactNode }
 
