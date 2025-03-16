@@ -1,2 +1,2 @@
-export type { ComposerRootProps } from './types'
+export type { ComposerRootProps, ComposerEditorProps } from './types'
 export * as Composer from './konpo'

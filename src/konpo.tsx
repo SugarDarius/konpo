@@ -6,7 +6,7 @@ import { Slottable } from '@radix-ui/react-slot'
 
 import { useStableCallback } from './_hooks/use-stable-callback'
 
-import type { ComposerRootProps } from './types'
+import type { ComposerRootProps, ComposerEditorProps } from './types'
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider } from './store'
@@ -36,6 +36,13 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   }
 )
 
-ComposerRoot.displayName = 'Composer.Root'
+const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
+  ({ dir, placeholder, ...props }, forwardedRef) => {
+    return <Primitive.div ref={forwardedRef} {...props} konpo-editor='' />
+  }
+)
 
-export { ComposerRoot as Root }
+ComposerRoot.displayName = 'Composer.Root'
+ComposerEditor.displayName = 'Composer.Editor'
+
+export { ComposerRoot as Root, ComposerEditor as Editor }
