@@ -22,6 +22,7 @@ import {
   toggleComposerEditorMark,
   getComposerEditorActiveSelectionRange,
   discardComposerEditorActiveSelectionRange,
+  clearComposerEditorMarks,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 import { isHotKey } from './_utils/keyboard'
@@ -82,6 +83,9 @@ export function createKonpoStore({
 
       requestAnimationFrame(() => {
         const isEmpty = isComposerEditorEmpty(editor, editor.children)
+        if (isEmpty) {
+          clearComposerEditorMarks(editor)
+        }
         const selectedMarks = getSelectedComposerEditorMarks(editor)
         const activeSelectionRange = getComposerEditorActiveSelectionRange(
           editor,
@@ -99,6 +103,7 @@ export function createKonpoStore({
     clear: (): void => {
       const editor = get().editor
       clearComposerEditor(editor)
+      clearComposerEditorMarks(editor)
 
       set({
         canSubmit: false,

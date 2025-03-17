@@ -280,6 +280,19 @@ export function toggleComposerEditorMark(
     SlateEditor.addMark(editor, mark, true)
   }
 }
+export function clearComposerEditorMarks(editor: ComposerEditor): void {
+  ignoreOnThrow(
+    "Failed to clear composer's editor marks, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      const marks = SlateEditor.marks(editor)
+      if (marks) {
+        for (const mark in marks) {
+          SlateEditor.removeMark(editor, mark)
+        }
+      }
+    }
+  )
+}
 export function getComposerEditorActiveSelectionRange(
   editor: SlateEditor,
   domSelection: Selection | null
