@@ -19,6 +19,11 @@ export function CommentComposer() {
   return (
     <Composer.Root>
       <Composer.Editor />
+      <Composer.FloatingToolbar>
+        <Composer.ToggleMarkTrigger>
+          <BoldIcon />
+        </Composer.ToggleMarkTrigger>
+      </Composer.FloatingToolbar>
       <Composer.SubmitTrigger />
     </Composer.Root>
   )
