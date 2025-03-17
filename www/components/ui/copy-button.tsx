@@ -2,10 +2,11 @@
 
 import { Check, Copy } from 'lucide-react'
 import { AnimatePresence, type Variants, motion } from 'motion/react'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 import { useMounted } from '@/hooks/use-mounted'
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard'
 import { Button } from '@/components/ui/button'
 
 const COPY_ANIMATION_DURATION = 2000
@@ -60,32 +61,25 @@ export function CopyButton({
   className?: string
   label?: string
 }) {
-  const timeout = useRef(0)
   const isMounted = useMounted()
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const copyToClipboard = useCallback(async (text: string) => {
-    window.clearTimeout(timeout.current)
-
-    try {
-      await navigator.clipboard.writeText(text)
-    } catch {}
-  }, [])
+  const [, copy] = useCopyToClipboard()
 
   const handleCopy = useCallback(() => {
-    copyToClipboard(text)
+    copy(text)
     setIsAnimating(true)
 
     setTimeout(() => {
       setIsAnimating(false)
     }, COPY_ANIMATION_DURATION)
-  }, [copyToClipboard, text])
+  }, [copy, text])
 
   return (
     <Button
       aria-label={label}
       className={cn(
-        'hover:bg-secondary focus-visible:bg-secondary data-[state=open]:bg-secondary',
+        'hover:bg-secondary focus-visible:bg-secondary data-[state=open]:bg-secondary shadow-sm',
         className
       )}
       onClick={handleCopy}
