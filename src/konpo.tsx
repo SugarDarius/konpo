@@ -417,20 +417,12 @@ const ComposerFloatingToolbar = forwardRef<
   const { getFloatingProps } = useInteractions([dismiss])
 
   useLayoutEffect(() => {
-    let frameId: number | null = null
     if (activeSelectionRange !== null) {
-      frameId = requestAnimationFrame(() => {
-        refs.setReference({
-          getBoundingClientRect: () =>
-            activeSelectionRange.getBoundingClientRect(),
-          getClientRects: () => activeSelectionRange.getClientRects(),
-        })
+      refs.setReference({
+        getBoundingClientRect: () =>
+          activeSelectionRange.getBoundingClientRect(),
+        getClientRects: () => activeSelectionRange.getClientRects(),
       })
-    }
-    return () => {
-      if (frameId !== null) {
-        cancelAnimationFrame(frameId)
-      }
     }
   }, [activeSelectionRange])
 

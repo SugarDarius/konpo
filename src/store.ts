@@ -76,18 +76,20 @@ export function createKonpoStore({
       const editor = get().editor
       const disabled = get().disabled
 
-      const isEmpty = isComposerEditorEmpty(editor, editor.children)
-      const selectedMarks = getSelectedComposerEditorMarks(editor)
-      const activeSelectionRange = getComposerEditorActiveSelectionRange(
-        editor,
-        window.getSelection()
-      )
+      requestAnimationFrame(() => {
+        const isEmpty = isComposerEditorEmpty(editor, editor.children)
+        const selectedMarks = getSelectedComposerEditorMarks(editor)
+        const activeSelectionRange = getComposerEditorActiveSelectionRange(
+          editor,
+          window.getSelection()
+        )
 
-      set({
-        canSubmit: !isEmpty && !disabled,
-        selectedMarks,
-        isSelectionRangeActive: activeSelectionRange !== null,
-        activeSelectionRange,
+        set({
+          canSubmit: !isEmpty && !disabled,
+          selectedMarks,
+          isSelectionRangeActive: activeSelectionRange !== null,
+          activeSelectionRange,
+        })
       })
     },
     clear: (): void => {
