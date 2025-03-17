@@ -8,7 +8,7 @@ import {
   ComposerSubmitTrigger,
   ComposerFloatingToolbar,
   ComposerToggleMarkTrigger,
-} from '@/components/composer/composer'
+} from '@/components/ui/composer'
 import { Separator } from '@/components/ui/separator'
 
 export function BasicExample1() {
