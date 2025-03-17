@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
 
-import { useLayoutEffect } from './_hooks/use-layout-effect'
+import { useIsomorphicLayoutEffect } from './_hooks/use-isomorphic-layout-effect'
 import { useStableCallback } from './_hooks/use-stable-callback'
 
 import type {
@@ -195,7 +195,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
       )
     )
 
-    useLayoutEffect(() => {
+    useIsomorphicLayoutEffect(() => {
       if (autoFocus) {
         focus()
       }

@@ -1,12 +1,12 @@
 import { useCallback, useRef } from 'react'
-import { useLayoutEffect } from './use-layout-effect'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 export function useStableCallback<A extends unknown[], R>(
   callback: (...args: A) => R
 ): (...args: A) => R {
   const callbackRef = useRef(callback)
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     callbackRef.current = callback
   })
 
