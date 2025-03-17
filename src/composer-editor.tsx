@@ -43,6 +43,9 @@ export type ComposerParagraphElement = {
   children: ComposerInlineElement[]
 }
 
+export type ComposerMark = keyof Omit<ComposerText, 'text'>
+export type ComposerMarks = Record<ComposerMark, boolean>
+
 declare module 'slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor & HistoryEditor
