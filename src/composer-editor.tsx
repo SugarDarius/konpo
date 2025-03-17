@@ -259,3 +259,23 @@ export function getSelectedComposerMarks(
   const marks = SlateEditor.marks(editor)
   return { ...baseComposerMarks, ...marks }
 }
+export function isComposerMarkActive(
+  editor: ComposerEditor,
+  mark: ComposerMark
+): boolean {
+  const marks = getSelectedComposerMarks(editor)
+  const isActive = marks[mark]
+
+  return isActive
+}
+export function toggleComposerMark(
+  editor: ComposerEditor,
+  mark: ComposerMark
+): void {
+  const isMarkActive = isComposerMarkActive(editor, mark)
+  if (isMarkActive) {
+    SlateEditor.removeMark(editor, mark)
+  } else {
+    SlateEditor.addMark(editor, mark, true)
+  }
+}

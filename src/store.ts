@@ -18,6 +18,8 @@ import {
   type ComposerEditorDescendant,
   type ComposerMarks,
   getSelectedComposerMarks,
+  type ComposerMark,
+  toggleComposerMark,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 
@@ -33,6 +35,7 @@ export type KonpoStore = {
   assert: () => void
   clear: () => void
   blur: () => void
+  toggleMark: (mark: ComposerMark) => void
   onSubmit: () => void
 }
 
@@ -80,6 +83,14 @@ export function createKonpoStore({
     blur: (): void => {
       const editor = get().editor
       blurComposerEditor(editor)
+    },
+    toggleMark: (mark: ComposerMark): void => {
+      const editor = get().editor
+
+      toggleComposerMark(editor, mark)
+      const selectedMarks = getSelectedComposerMarks(editor)
+
+      set({ selectedMarks })
     },
     onSubmit: (): void => {
       const editor = get().editor
