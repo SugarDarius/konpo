@@ -1,5 +1,7 @@
 import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps, ReactNode } from 'react'
+
+import type { Hotkey } from './_utils/keyboard'
 import type { ComposerMark } from './composer-editor'
 
 export type Awaitable<T> = T | Promise<T>
@@ -43,6 +45,10 @@ export interface ComposerRootProps
    * A callback that is called when the composer is submitted.
    */
   onSubmit?: (body: KonpoComposedBody) => Awaitable<void>
+  /**
+   * Hotkey to submit the composer.
+   */
+  submitHotkey?: Hotkey
   /**
    * Composer initial content.
    */

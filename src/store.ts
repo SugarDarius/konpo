@@ -25,7 +25,7 @@ import {
   clearComposerEditorMarks,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
-import { isHotKey } from './_utils/keyboard'
+import { type Hotkey, isHotKey } from './_utils/keyboard'
 
 export type KonpoStore = {
   editor: ComposerEditor
@@ -36,6 +36,7 @@ export type KonpoStore = {
   selectedMarks: ComposerMarks
   isSelectionRangeActive: boolean
   activeSelectionRange: Range | null
+  submitHotkey: Hotkey
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -50,10 +51,12 @@ export type KonpoStore = {
 export function createKonpoStore({
   disabled,
   initialValue,
+  submitHotkey = 'mod+Enter',
   onSubmit,
 }: {
   disabled: boolean
   initialValue?: KonpoComposedBody
+  submitHotkey?: Hotkey
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
@@ -67,6 +70,7 @@ export function createKonpoStore({
     selectedMarks: baseComposerMarks,
     isSelectionRangeActive: false,
     activeSelectionRange: null,
+    submitHotkey,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -139,22 +143,32 @@ export function createKonpoStore({
       const editor = get().editor
       const isSelectionRangeActive = get().isSelectionRangeActive
       const discardActiveSelectionRange = get().discardActiveSelectionRange
+      const submitHotkey = get().submitHotkey
+      const onSubmit = get().onSubmit
 
       const blur = get().blur
       if (e.isDefaultPrevented()) {
         return
       }
 
-      if (isSelectionRangeActive) {
-        if (isHotKey('Escape', e)) {
+      if (isHotKey('Escape', e)) {
+        if (isSelectionRangeActive) {
           e.preventDefault()
+
           discardActiveSelectionRange()
           discardComposerEditorActiveSelectionRange(editor)
-        }
-      } else {
-        if (isHotKey('Escape', e)) {
+        } else {
           blur()
         }
+
+        return
+      }
+
+      if (isHotKey(submitHotkey, e)) {
+        e.preventDefault()
+        onSubmit()
+
+        return
       }
     },
     onSubmit: (): void => {
