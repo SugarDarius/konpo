@@ -6,6 +6,16 @@ import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
 import { Portal } from '@radix-ui/react-portal'
 
+import {
+  useFloating,
+  useDismiss,
+  useInteractions,
+  flip,
+  shift,
+  inline,
+  autoUpdate,
+} from '@floating-ui/react'
+
 import { useIsomorphicLayoutEffect } from './_hooks/use-isomorphic-layout-effect'
 import { useStableCallback } from './_hooks/use-stable-callback'
 
@@ -151,7 +161,7 @@ const ComposerEditorPlaceholder = ({
  */
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
   (
-    { dir, placeholder, autoFocus = false, onFocus, onBlur, ...props },
+    { placeholder, autoFocus = false, dir, onFocus, onBlur, ...props },
     forwardedRef
   ) => {
     const store = useKonpoStore()
@@ -159,9 +169,9 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     const editor = useSelectorKey(store, 'editor')
     const disabled = useSelectorKey(store, 'disabled')
     const focused = useSelectorKey(store, 'focused')
-    const focus = useStableCallback(useSelectorKey(store, 'focus'))
 
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
+    const focus = useStableCallback(useSelectorKey(store, 'focus'))
 
     const handleChange = useStableCallback(useSelectorKey(store, 'assert'))
     const handleFocus = useStableCallback(
@@ -372,11 +382,27 @@ const ComposerFloatingToolbar = forwardRef<
   const isSelectionRangeActive = useSelectorKey(store, 'isSelectionRangeActive')
   const isFocused = useSelectorKey(store, 'focused')
 
-  const Comp = asChild ? Slot : Primitive.div
   const isOpen = isSelectionRangeActive && isFocused
 
+  const { refs, floatingStyles, context } = useFloating({
+    strategy: 'fixed',
+    placement: 'top',
+    open: isOpen,
+    middleware: [inline(), flip(), shift()],
+    whileElementsMounted: (...args) =>
+      autoUpdate(...args, { animationFrame: true }),
+  })
+  const dismiss = useDismiss(context)
+  const { getFloatingProps } = useInteractions([dismiss])
+
+  const Comp = asChild ? Slot : Primitive.div
+
   return isOpen ? (
-    <Portal>
+    <Portal
+      ref={refs.setFloating}
+      style={{ ...floatingStyles, minWidth: 'max-content' }}
+      {...getFloatingProps()}
+    >
       <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />
     </Portal>
   ) : null
