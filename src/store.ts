@@ -13,8 +13,10 @@ import {
   selectComposerEditor,
   toKonpoComposedBody,
   toComposerEditorDescendants,
+  baseComposerMarks,
   type ComposerEditor,
   type ComposerEditorDescendant,
+  type ComposerMarks,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 
@@ -24,6 +26,7 @@ export type KonpoStore = {
   focused: boolean
   canSubmit: boolean
   initialValue: ComposerEditorDescendant[]
+  marks: ComposerMarks
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -49,6 +52,7 @@ export function createKonpoStore({
     initialValue: initialValue
       ? toComposerEditorDescendants(initialValue)
       : [{ type: 'paragraph', children: [{ text: '' }] }],
+    marks: baseComposerMarks,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)

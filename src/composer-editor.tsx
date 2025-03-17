@@ -169,6 +169,13 @@ export function toKonpoComposedBody(
   }
 }
 
+export const baseComposerMarks: ComposerMarks = {
+  bold: false,
+  italic: false,
+  strikethrough: false,
+  code: false,
+}
+
 // NOTE: This function is used to check if the editor is empty.
 // It may be useful to rethink this algorithm to make it more efficient.
 export function isComposerEditorEmpty(
