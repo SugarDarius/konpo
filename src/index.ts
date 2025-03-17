@@ -4,6 +4,7 @@ export type {
   ComposerEditorProps,
   ComposerSubmitTriggerProps,
   ComposerMarkToggleTriggerProps,
+  ComposerFloatingToolbarProps,
   KonpoText,
   KonpoInlineElement,
   KonpoParagraphElement,

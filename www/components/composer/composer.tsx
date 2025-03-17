@@ -4,7 +4,8 @@ import {
   Composer as ComposerPrimitive,
   type ComposerRootProps,
   type ComposerEditorProps,
-  ComposerSubmitTriggerProps,
+  type ComposerSubmitTriggerProps,
+  type ComposerFloatingToolbarProps,
 } from 'konpo'
 
 import { cn } from '@/lib/utils'
@@ -45,5 +46,17 @@ export function ComposerSubmitTrigger({
         {children}
       </Button>
     </ComposerPrimitive.SubmitTrigger>
+  )
+}
+
+export function ComposerFloatingToolbar({
+  className,
+  ...props
+}: ComposerFloatingToolbarProps) {
+  return (
+    <ComposerPrimitive.FloatingToolbar
+      className={cn('p-4 rounded-lg bg-muted', className)}
+      {...props}
+    />
   )
 }
