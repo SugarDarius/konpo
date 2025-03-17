@@ -373,7 +373,7 @@ const ComposerFloatingToolbar = forwardRef<
   return createPortal(
     <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />,
     document.body,
-    'konpo-floating-toolbar'
+    'konpo-floating-toolbar-portal'
   )
 })
 
