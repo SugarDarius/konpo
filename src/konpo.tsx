@@ -16,12 +16,12 @@ import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
 import {
-  KonpoEditorEditable,
-  KonpoEditorWrapper,
-  type KonpoEditorEditableRenderElementProps,
-  type KonpoEditorEditableRenderLeafProps,
-  type KonpoEditorEditableRenderPlaceholderProps,
-} from './editor'
+  ComposerEditorEditable,
+  ComposerEditorWrapper,
+  type ComposerEditorEditableRenderElementProps,
+  type ComposerEditorEditableRenderLeafProps,
+  type ComposerEditorEditableRenderPlaceholderProps,
+} from './composer-editor'
 import { useInitial } from './_hooks/use-initial'
 
 /**
@@ -76,7 +76,7 @@ const ComposerEditorElement = ({
   element,
   attributes,
   children,
-}: KonpoEditorEditableRenderElementProps) => {
+}: ComposerEditorEditableRenderElementProps) => {
   switch (element.type) {
     case 'paragraph':
       return (
@@ -101,7 +101,7 @@ const ComposerEditorLeaf = ({
   leaf,
   attributes,
   children,
-}: KonpoEditorEditableRenderLeafProps) => {
+}: ComposerEditorEditableRenderLeafProps) => {
   let content = children
   if (leaf.bold) {
     content = <strong>{content}</strong>
@@ -126,7 +126,7 @@ const ComposerEditorLeaf = ({
 const ComposerEditorPlaceholder = ({
   attributes,
   children,
-}: KonpoEditorEditableRenderPlaceholderProps) => {
+}: ComposerEditorEditableRenderPlaceholderProps) => {
   return (
     <Primitive.span {...attributes} konpo-placeholder=''>
       {children}
@@ -178,19 +178,19 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     )
 
     const renderElement = useStableCallback(
-      (props: KonpoEditorEditableRenderElementProps) => (
+      (props: ComposerEditorEditableRenderElementProps) => (
         <ComposerEditorElement {...props} />
       )
     )
 
     const renderLeaf = useStableCallback(
-      (props: KonpoEditorEditableRenderLeafProps) => (
+      (props: ComposerEditorEditableRenderLeafProps) => (
         <ComposerEditorLeaf {...props} />
       )
     )
 
     const renderPlaceholder = useStableCallback(
-      (props: KonpoEditorEditableRenderPlaceholderProps) => (
+      (props: ComposerEditorEditableRenderPlaceholderProps) => (
         <ComposerEditorPlaceholder {...props} />
       )
     )
@@ -202,12 +202,12 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     }, [autoFocus, focus])
 
     return (
-      <KonpoEditorWrapper
+      <ComposerEditorWrapper
         editor={editor}
         initialValue={initialValue}
         onChange={handleChange}
       >
-        <KonpoEditorEditable
+        <ComposerEditorEditable
           {...props}
           ref={forwardedRef}
           konpo-editable=''
@@ -229,7 +229,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           onFocus={handleFocus}
           onBlur={handleBlur}
         />
-      </KonpoEditorWrapper>
+      </ComposerEditorWrapper>
     )
   }
 )

@@ -29,11 +29,25 @@ import type {
 } from './types'
 import { ignoreOnThrow } from './_utils/error'
 
+export type ComposerText = {
+  bold?: boolean
+  italic?: boolean
+  strikethrough?: boolean
+  code?: boolean
+  text: string
+}
+
+export type ComposerInlineElement = ComposerText
+export type ComposerParagraphElement = {
+  type: 'paragraph'
+  children: ComposerInlineElement[]
+}
+
 declare module 'slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor & HistoryEditor
-    Element: KonpoParagraphElement
-    Text: KonpoText
+    Element: ComposerParagraphElement
+    Text: ComposerText
   }
 }
 
@@ -44,43 +58,44 @@ declare module 'slate-react' {
   > & { element: E }
 }
 
-export function createKonpoEditor() {
+export function createComposerEditor() {
   return withHistory(withReact(createSlateEditor()))
 }
 
-export type KonpoEditor = ReturnType<typeof createKonpoEditor>
-export type KonpoEditorDescendant = Descendant
+export type ComposerEditor = ReturnType<typeof createComposerEditor>
+export type ComposerEditorDescendant = Descendant
 
-export const KonpoEditorWrapper = (props: {
-  editor: KonpoEditor
-  initialValue: KonpoEditorDescendant[]
-  onChange: (value: KonpoEditorDescendant[]) => void
+export const ComposerEditorWrapper = (props: {
+  editor: ComposerEditor
+  initialValue: ComposerEditorDescendant[]
+  onChange: (value: ComposerEditorDescendant[]) => void
   children: React.ReactNode
 }) => <Slate {...props} />
 
-type KonpoEditorEditableProps = React.ComponentProps<typeof Editable>
-export const KonpoEditorEditable = (props: KonpoEditorEditableProps) => (
+type ComposerEditorEditableProps = React.ComponentProps<typeof Editable>
+export const ComposerEditorEditable = (props: ComposerEditorEditableProps) => (
   <Editable {...props} />
 )
 
 // TODO: add more properties like mentions, links, etc.
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface KonpoEditorEditableRenderElementProps
+export interface ComposerEditorEditableRenderElementProps
   extends RenderElementProps {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface KonpoEditorEditableRenderLeafProps extends RenderLeafProps {}
+export interface ComposerEditorEditableRenderLeafProps
+  extends RenderLeafProps {}
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface KonpoEditorEditableRenderPlaceholderProps
+export interface ComposerEditorEditableRenderPlaceholderProps
   extends RenderPlaceholderProps {}
 
 const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
   inline.text !== undefined && typeof inline.text === 'string'
 
-export function toKonpoEditorDescendants(
+export function toComposerEditorDescendants(
   body: KonpoComposedBody
-): KonpoEditorDescendant[] {
+): ComposerEditorDescendant[] {
   if (body.content.length <= 0) {
     return []
   }
@@ -110,15 +125,17 @@ export function toKonpoEditorDescendants(
 }
 
 const isComposerParagraphElement = (
-  element: KonpoEditorDescendant
+  element: ComposerEditorDescendant
 ): element is KonpoParagraphElement =>
   'type' in element && element.type === 'paragraph'
 
-const isComposerText = (element: KonpoEditorDescendant): element is KonpoText =>
+const isComposerText = (
+  element: ComposerEditorDescendant
+): element is KonpoText =>
   !('type' in element) && 'text' in element && typeof element.text === 'string'
 
 export function toKonpoComposedBody(
-  children: KonpoEditorDescendant[]
+  children: ComposerEditorDescendant[]
 ): KonpoComposedBody {
   if (children.length <= 0) {
     return { content: [] }
@@ -151,9 +168,9 @@ export function toKonpoComposedBody(
 
 // NOTE: This function is used to check if the editor is empty.
 // It may be useful to rethink this algorithm to make it more efficient.
-export function isKonpoEditorEmpty(
-  editor: KonpoEditor,
-  descendants: KonpoEditorDescendant[]
+export function isComposerEditorEmpty(
+  editor: ComposerEditor,
+  descendants: ComposerEditorDescendant[]
 ): boolean {
   if (descendants.length <= 0) {
     return true
@@ -165,7 +182,7 @@ export function isKonpoEditorEmpty(
         return false
       }
     } else if (isComposerParagraphElement(descendant)) {
-      if (!isKonpoEditorEmpty(editor, descendant.children)) {
+      if (!isComposerEditorEmpty(editor, descendant.children)) {
         return false
       }
     }
@@ -178,9 +195,9 @@ export function isKonpoEditorEmpty(
 // in case the editor's DOM node can no longer exists if the composer
 // is unmounted before the operation is completed.
 // We can ignore these errors and log them in development 👇🏻
-export function clearKonpoEditor(editor: KonpoEditor): void {
+export function clearComposerEditor(editor: ComposerEditor): void {
   ignoreOnThrow(
-    "Failed to clear konpo editor, 'Composer' may be unmounted.",
+    "Failed to clear composer's editor, '<Composer.Root />' may be unmounted.",
     (): void => {
       SlateTransforms.delete(editor, {
         at: {
@@ -191,20 +208,20 @@ export function clearKonpoEditor(editor: KonpoEditor): void {
     }
   )
 }
-export function blurKonpoEditor(editor: KonpoEditor): void {
+export function blurComposerEditor(editor: ComposerEditor): void {
   ignoreOnThrow(
-    "Failed to blur konpo editor, 'Composer' may be unmounted.",
+    "Failed to blur composer's editor, '<Composer.Root />' may be unmounted.",
     (): void => {
       SlateReactEditor.blur(editor)
     }
   )
 }
 export function focusKonpoEditor(
-  editor: KonpoEditor,
+  editor: ComposerEditor,
   resetSelection = true
 ): void {
   ignoreOnThrow(
-    "Failed to clear konpo editor, 'Composer' may be unmounted.",
+    "Failed to clear composer's editor, '<Composer.Root />' may be unmounted.",
     (): void => {
       if (!SlateReactEditor.isFocused(editor)) {
         SlateTransforms.select(
@@ -218,9 +235,9 @@ export function focusKonpoEditor(
     }
   )
 }
-export function selectKonpoEditor(editor: KonpoEditor): void {
+export function selectComposerEditor(editor: ComposerEditor): void {
   ignoreOnThrow(
-    "Failed to select konpo editor, 'Composer' may be unmounted.",
+    "Failed to select composer's editor, '<Composer.Root />' may be unmounted.",
     (): void => {
       SlateTransforms.select(editor, SlateEditor.end(editor, []))
     }

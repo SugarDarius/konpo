@@ -5,25 +5,25 @@ import {
 } from './_utils/create-store'
 import type { ComposerRootProps, KonpoComposedBody } from './types'
 import {
-  blurKonpoEditor,
-  clearKonpoEditor,
-  createKonpoEditor,
+  blurComposerEditor,
+  clearComposerEditor,
+  createComposerEditor,
   focusKonpoEditor,
-  isKonpoEditorEmpty,
-  selectKonpoEditor,
+  isComposerEditorEmpty,
+  selectComposerEditor,
   toKonpoComposedBody,
-  toKonpoEditorDescendants,
-  type KonpoEditor,
-  type KonpoEditorDescendant,
-} from './editor'
+  toComposerEditorDescendants,
+  type ComposerEditor,
+  type ComposerEditorDescendant,
+} from './composer-editor'
 import { isPromise } from './_utils/promise'
 
 export type KonpoStore = {
-  editor: KonpoEditor
+  editor: ComposerEditor
   disabled: boolean
   focused: boolean
   canSubmit: boolean
-  initialValue: KonpoEditorDescendant[]
+  initialValue: ComposerEditorDescendant[]
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -42,16 +42,16 @@ export function createKonpoStore({
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
-    editor: createKonpoEditor(),
+    editor: createComposerEditor(),
     disabled,
     focused: false,
     canSubmit: false,
     initialValue: initialValue
-      ? toKonpoEditorDescendants(initialValue)
+      ? toComposerEditorDescendants(initialValue)
       : [{ type: 'paragraph', children: [{ text: '' }] }],
     select: (): void => {
       const editor = get().editor
-      selectKonpoEditor(editor)
+      selectComposerEditor(editor)
     },
     focus: (resetSelection?: boolean): void => {
       const editor = get().editor
@@ -61,25 +61,25 @@ export function createKonpoStore({
       const editor = get().editor
       const disabled = get().disabled
 
-      const isEmpty = isKonpoEditorEmpty(editor, editor.children)
+      const isEmpty = isComposerEditorEmpty(editor, editor.children)
 
       set({ canSubmit: !isEmpty && !disabled })
     },
     clear: (): void => {
       const editor = get().editor
-      clearKonpoEditor(editor)
+      clearComposerEditor(editor)
 
       set({ canSubmit: false })
     },
     blur: (): void => {
       const editor = get().editor
-      blurKonpoEditor(editor)
+      blurComposerEditor(editor)
     },
     onSubmit: (): void => {
       const editor = get().editor
 
       // Extra check to avoid submitting an empty body
-      if (isKonpoEditorEmpty(editor, editor.children)) {
+      if (isComposerEditorEmpty(editor, editor.children)) {
         return
       }
 
