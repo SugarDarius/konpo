@@ -24,7 +24,7 @@ import {
   discardComposerEditorActiveSelectionRange,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
-import { isKey } from './_utils/keyboard'
+import { isHotKey } from './_utils/keyboard'
 
 export type KonpoStore = {
   editor: ComposerEditor
@@ -141,13 +141,13 @@ export function createKonpoStore({
       }
 
       if (isSelectionRangeActive) {
-        if (isKey(e, 'Escape')) {
+        if (isHotKey('Escape', e)) {
           e.preventDefault()
           discardActiveSelectionRange()
           discardComposerEditorActiveSelectionRange(editor)
         }
       } else {
-        if (isKey(e, 'Escape')) {
+        if (isHotKey('Escape', e)) {
           blur()
         }
       }
