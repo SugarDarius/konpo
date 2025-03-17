@@ -253,3 +253,9 @@ export function selectComposerEditor(editor: ComposerEditor): void {
     }
   )
 }
+export function getSelectedComposerMarks(
+  editor: ComposerEditor
+): ComposerMarks {
+  const marks = SlateEditor.marks(editor)
+  return { ...baseComposerMarks, ...marks }
+}

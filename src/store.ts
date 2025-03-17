@@ -17,6 +17,7 @@ import {
   type ComposerEditor,
   type ComposerEditorDescendant,
   type ComposerMarks,
+  getSelectedComposerMarks,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 
@@ -26,7 +27,7 @@ export type KonpoStore = {
   focused: boolean
   canSubmit: boolean
   initialValue: ComposerEditorDescendant[]
-  marks: ComposerMarks
+  selectedMarks: ComposerMarks
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -52,7 +53,7 @@ export function createKonpoStore({
     initialValue: initialValue
       ? toComposerEditorDescendants(initialValue)
       : [{ type: 'paragraph', children: [{ text: '' }] }],
-    marks: baseComposerMarks,
+    selectedMarks: baseComposerMarks,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -66,8 +67,9 @@ export function createKonpoStore({
       const disabled = get().disabled
 
       const isEmpty = isComposerEditorEmpty(editor, editor.children)
+      const selectedMarks = getSelectedComposerMarks(editor)
 
-      set({ canSubmit: !isEmpty && !disabled })
+      set({ canSubmit: !isEmpty && !disabled, selectedMarks })
     },
     clear: (): void => {
       const editor = get().editor
