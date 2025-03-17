@@ -63,6 +63,4 @@ export interface ComposerEditorProps extends DivProps {
   autoFocus?: boolean
 }
 
-export interface ComposerSubmitButtonProps extends ButtonProps, Children {
-  // TODO: add keyboard shortcut to submit
-}
+export interface ComposerSubmitTriggerProps extends ButtonProps, Children {}

@@ -16,9 +16,9 @@ export function BasicExample1() {
         autoFocus
         placeholder='Write a message'
       />
-      <Composer.SubmitButton asChild>
+      <Composer.SubmitTrigger asChild>
         <Button>Send</Button>
-      </Composer.SubmitButton>
+      </Composer.SubmitTrigger>
     </Composer.Root>
   )
 }

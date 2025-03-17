@@ -2,7 +2,7 @@ export type {
   Awaitable,
   ComposerRootProps,
   ComposerEditorProps,
-  ComposerSubmitButtonProps,
+  ComposerSubmitTriggerProps,
   KonpoText,
   KonpoInlineElement,
   KonpoParagraphElement,

@@ -10,7 +10,7 @@ import { useStableCallback } from './_hooks/use-stable-callback'
 import type {
   ComposerRootProps,
   ComposerEditorProps,
-  ComposerSubmitButtonProps,
+  ComposerSubmitTriggerProps,
 } from './types'
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
@@ -220,19 +220,19 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 )
 
 /**
- * Adds a submit button to the composer.
+ * Adds a submit trigger to the composer.
  *
  * It will be disabled if the composer is disabled or the editor is empty
  * or you explicitly set the `disabled` prop.
  *
  * @example
  * ```tsx
- * <Composer.SubmitButton>Send</Composer.SubmitButton>
+ * <Composer.SubmitTrigger>Send</Composer.SubmitTrigger>
  * ```
  */
-const ComposerSubmitButton = forwardRef<
+const ComposerSubmitTrigger = forwardRef<
   HTMLButtonElement,
-  ComposerSubmitButtonProps
+  ComposerSubmitTriggerProps
 >(({ asChild, disabled, onClick, ...props }, forwardedRef) => {
   const store = useKonpoStore()
 
@@ -265,10 +265,10 @@ const ComposerSubmitButton = forwardRef<
 
 ComposerRoot.displayName = 'Composer.Root'
 ComposerEditor.displayName = 'Composer.Editor'
-ComposerSubmitButton.displayName = 'Composer.SubmitButton'
+ComposerSubmitTrigger.displayName = 'Composer.ComposerSubmitTrigger'
 
 export {
   ComposerRoot as Root,
   ComposerEditor as Editor,
-  ComposerSubmitButton as SubmitButton,
+  ComposerSubmitTrigger as SubmitTrigger,
 }
