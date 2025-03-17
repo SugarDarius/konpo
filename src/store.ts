@@ -86,17 +86,19 @@ export function createKonpoStore({
       set({ focused: true })
     },
     assert: (): void => {
-      const editor = get().editor
-      const disabled = get().disabled
+      const state = get()
 
       requestAnimationFrame(() => {
-        const isEmpty = isComposerEditorEmpty(editor, editor.children)
+        const isEmpty = isComposerEditorEmpty(
+          state.editor,
+          state.editor.children
+        )
         if (isEmpty) {
-          clearComposerEditorMarks(editor)
+          clearComposerEditorMarks(state.editor)
         }
-        const selectedMarks = getSelectedComposerEditorMarks(editor)
+        const selectedMarks = getSelectedComposerEditorMarks(state.editor)
         const activeSelectionRange = getComposerEditorActiveSelectionRange(
-          editor,
+          state.editor,
           window.getSelection()
         )
 
@@ -144,60 +146,52 @@ export function createKonpoStore({
       })
     },
     handleKeyboardKeys: (e: React.KeyboardEvent<HTMLDivElement>): void => {
-      const editor = get().editor
-      const isSelectionRangeActive = get().isSelectionRangeActive
-      const discardActiveSelectionRange = get().discardActiveSelectionRange
-      const submitHotkey = get().submitHotkey
-      const boldMarkHotkey = get().boldMarkHotkey
-
-      const onSubmit = get().onSubmit
-
-      const blur = get().blur
+      const state = get()
       if (e.isDefaultPrevented()) {
         return
       }
 
       if (isHotKey('Escape', e)) {
-        if (isSelectionRangeActive) {
+        if (state.isSelectionRangeActive) {
           e.preventDefault()
 
-          discardActiveSelectionRange()
-          discardComposerEditorActiveSelectionRange(editor)
+          state.discardActiveSelectionRange()
+          discardComposerEditorActiveSelectionRange(state.editor)
         } else {
-          blur()
+          state.blur()
         }
 
         return
       }
 
-      if (isHotKey(submitHotkey, e)) {
+      if (isHotKey(state.submitHotkey, e)) {
         e.preventDefault()
-        onSubmit()
+        state.onSubmit()
 
         return
       }
 
-      if (isHotKey(boldMarkHotkey, e)) {
+      if (isHotKey(state.boldMarkHotkey, e)) {
         e.preventDefault()
-        get().toggleMark('bold')
+        state.toggleMark('bold')
 
         return
       }
     },
     onSubmit: (): void => {
-      const editor = get().editor
+      const state = get()
 
       // Extra check to avoid submitting an empty body
-      if (isComposerEditorEmpty(editor, editor.children)) {
+      if (isComposerEditorEmpty(state.editor, state.editor.children)) {
         return
       }
 
       const after = (): void => {
-        get().clear()
-        get().blur()
+        state.clear()
+        state.blur()
       }
 
-      const body = toKonpoComposedBody(editor.children)
+      const body = toKonpoComposedBody(state.editor.children)
       const maybePromise = onSubmit(body)
       if (isPromise(maybePromise)) {
         maybePromise.then(after)
