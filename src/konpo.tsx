@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef } from 'react'
+import { forwardRef, useLayoutEffect } from 'react'
 
 import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
@@ -380,12 +380,14 @@ const ComposerFloatingToolbar = forwardRef<
   ComposerFloatingToolbarProps
 >(({ asChild, ...props }, forwardedRef) => {
   const store = useKonpoStore()
+
   const isSelectionRangeActive = useSelectorKey(store, 'isSelectionRangeActive')
   const isFocused = useSelectorKey(store, 'focused')
+  const activeSelectionRange = useSelectorKey(store, 'activeSelectionRange')
 
   const isOpen = isSelectionRangeActive && isFocused
 
-  const { refs, floatingStyles, context } = useFloating({
+  const { refs, floatingStyles, context, placement } = useFloating({
     strategy: 'fixed',
     placement: 'top',
     open: isOpen,
@@ -394,6 +396,7 @@ const ComposerFloatingToolbar = forwardRef<
       flip(),
       shift(),
       size({
+        padding: 8,
         apply: ({ availableWidth, availableHeight, elements }) => {
           elements.floating.style.setProperty(
             '--konpo-composer-floating-toolbar-available-width',
@@ -412,7 +415,26 @@ const ComposerFloatingToolbar = forwardRef<
   const dismiss = useDismiss(context)
   const { getFloatingProps } = useInteractions([dismiss])
 
+  useLayoutEffect(() => {
+    let frameId: number | null = null
+    if (activeSelectionRange !== null) {
+      frameId = requestAnimationFrame(() => {
+        refs.setReference({
+          getBoundingClientRect: () =>
+            activeSelectionRange.getBoundingClientRect(),
+          getClientRects: () => activeSelectionRange.getClientRects(),
+        })
+      })
+    }
+    return () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+    }
+  }, [activeSelectionRange])
+
   const Comp = asChild ? Slot : Primitive.div
+  const [side, align = 'center'] = placement.split('-')
 
   return isOpen ? (
     <Portal
@@ -420,7 +442,13 @@ const ComposerFloatingToolbar = forwardRef<
       style={{ ...floatingStyles, minWidth: 'max-content' }}
       {...getFloatingProps()}
     >
-      <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />
+      <Comp
+        {...props}
+        ref={forwardedRef}
+        data-side={side}
+        data-align={align}
+        konpo-floating-toolbar=''
+      />
     </Portal>
   ) : null
 })
