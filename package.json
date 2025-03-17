@@ -63,6 +63,7 @@
     "typescript-eslint": "^8.26.1"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.5",
     "@radix-ui/react-portal": "^1.1.4",
     "@radix-ui/react-primitive": "^2.0.2",
     "@radix-ui/react-slot": "^1.1.2",
