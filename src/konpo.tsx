@@ -368,13 +368,18 @@ const ComposerFloatingToolbar = forwardRef<
   HTMLDivElement,
   ComposerFloatingToolbarProps
 >(({ asChild, ...props }, forwardedRef) => {
-  const Comp = asChild ? Slot : Primitive.div
+  const store = useKonpoStore()
+  const isSelectionRangeActive = useSelectorKey(store, 'isSelectionRangeActive')
+  const isFocused = useSelectorKey(store, 'focused')
 
-  return (
+  const Comp = asChild ? Slot : Primitive.div
+  const isOpen = isSelectionRangeActive && isFocused
+
+  return isOpen ? (
     <Portal>
       <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />
     </Portal>
-  )
+  ) : null
 })
 
 ComposerRoot.displayName = 'Composer.Root'
