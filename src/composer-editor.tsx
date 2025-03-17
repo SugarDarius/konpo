@@ -2,6 +2,7 @@ import {
   createEditor as createSlateEditor,
   Editor as SlateEditor,
   Transforms as SlateTransforms,
+  Range as SlateRange,
   type BaseEditor,
   type Element,
   type Descendant,
@@ -253,7 +254,7 @@ export function selectComposerEditor(editor: ComposerEditor): void {
     }
   )
 }
-export function getSelectedComposerMarks(
+export function getSelectedComposerEditorMarks(
   editor: ComposerEditor
 ): ComposerMarks {
   const marks = SlateEditor.marks(editor)
@@ -263,12 +264,12 @@ export function isComposerMarkActive(
   editor: ComposerEditor,
   mark: ComposerMark
 ): boolean {
-  const marks = getSelectedComposerMarks(editor)
+  const marks = getSelectedComposerEditorMarks(editor)
   const isActive = marks[mark]
 
   return isActive
 }
-export function toggleComposerMark(
+export function toggleComposerEditorMark(
   editor: ComposerEditor,
   mark: ComposerMark
 ): void {
@@ -278,4 +279,20 @@ export function toggleComposerMark(
   } else {
     SlateEditor.addMark(editor, mark, true)
   }
+}
+export function getComposerEditorActiveSelectionRange(
+  editor: SlateEditor,
+  domSelection: Selection | null
+): Range | null {
+  const selection = editor.selection
+  if (
+    !selection ||
+    SlateRange.isCollapsed(selection) ||
+    !domSelection ||
+    !domSelection.rangeCount
+  ) {
+    return null
+  }
+
+  return domSelection.getRangeAt(0)
 }

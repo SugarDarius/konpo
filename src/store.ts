@@ -17,9 +17,10 @@ import {
   type ComposerEditor,
   type ComposerEditorDescendant,
   type ComposerMarks,
-  getSelectedComposerMarks,
+  getSelectedComposerEditorMarks,
   type ComposerMark,
-  toggleComposerMark,
+  toggleComposerEditorMark,
+  getComposerEditorActiveSelectionRange,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 
@@ -30,6 +31,8 @@ export type KonpoStore = {
   canSubmit: boolean
   initialValue: ComposerEditorDescendant[]
   selectedMarks: ComposerMarks
+  isSelectionRangeActive: boolean
+  activeSelectionRange: Range | null
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -57,6 +60,8 @@ export function createKonpoStore({
       ? toComposerEditorDescendants(initialValue)
       : [{ type: 'paragraph', children: [{ text: '' }] }],
     selectedMarks: baseComposerMarks,
+    isSelectionRangeActive: false,
+    activeSelectionRange: null,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -70,9 +75,18 @@ export function createKonpoStore({
       const disabled = get().disabled
 
       const isEmpty = isComposerEditorEmpty(editor, editor.children)
-      const selectedMarks = getSelectedComposerMarks(editor)
+      const selectedMarks = getSelectedComposerEditorMarks(editor)
+      const activeSelectionRange = getComposerEditorActiveSelectionRange(
+        editor,
+        window.getSelection()
+      )
 
-      set({ canSubmit: !isEmpty && !disabled, selectedMarks })
+      set({
+        canSubmit: !isEmpty && !disabled,
+        selectedMarks,
+        isSelectionRangeActive: activeSelectionRange !== null,
+        activeSelectionRange,
+      })
     },
     clear: (): void => {
       const editor = get().editor
@@ -87,8 +101,8 @@ export function createKonpoStore({
     toggleMark: (mark: ComposerMark): void => {
       const editor = get().editor
 
-      toggleComposerMark(editor, mark)
-      const selectedMarks = getSelectedComposerMarks(editor)
+      toggleComposerEditorMark(editor, mark)
+      const selectedMarks = getSelectedComposerEditorMarks(editor)
 
       set({ selectedMarks })
     },
