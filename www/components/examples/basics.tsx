@@ -1,24 +1,21 @@
 'use client'
 
-import { Composer } from 'konpo'
-import { Button } from '@/components/ui/button'
+import {
+  Composer,
+  ComposerEditor,
+  ComposerSubmitTrigger,
+} from '@/components/composer/composer'
+import { Separator } from '@/components/ui/separator'
 
 export function BasicExample1() {
   return (
-    <Composer.Root
-      className='relative w-[300px] h-[200px] border'
-      onSubmit={(body) => {
-        console.log('body', body)
-      }}
-    >
-      <Composer.Editor
-        className='h-full'
-        autoFocus
-        placeholder='Write a message'
-      />
-      <Composer.SubmitTrigger asChild>
-        <Button>Send</Button>
-      </Composer.SubmitTrigger>
-    </Composer.Root>
+    <Composer onSubmit={(body) => console.log(body)}>
+      <ComposerEditor autoFocus placeholder='Write a message' />
+      <Separator />
+      <div className='flex items-center justify-between'>
+        <div />
+        <ComposerSubmitTrigger>Send</ComposerSubmitTrigger>
+      </div>
+    </Composer>
   )
 }

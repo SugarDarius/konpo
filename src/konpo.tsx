@@ -58,7 +58,12 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
       })
     )
     return (
-      <Primitive.div {...props} ref={forwardedRef} konpo-root=''>
+      <Primitive.div
+        {...props}
+        ref={forwardedRef}
+        konpo-root=''
+        style={{ position: 'relative' }}
+      >
         <KonpoStoreProvider store={store}>
           <Slottable>{children}</Slottable>
         </KonpoStoreProvider>
@@ -75,7 +80,11 @@ const ComposerEditorElement = ({
   switch (element.type) {
     case 'paragraph':
       return (
-        <Primitive.p {...attributes} konpo-paragraph=''>
+        <Primitive.p
+          {...attributes}
+          konpo-paragraph=''
+          style={{ position: 'relative' }}
+        >
           {children}
         </Primitive.p>
       )
@@ -204,6 +213,12 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           konpo-editable=''
           data-disabled={disabled}
           data-focused={focused}
+          disableDefaultStyles={true}
+          style={{
+            position: 'relative',
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+          }}
           dir={dir}
           readOnly={disabled}
           disabled={disabled}
