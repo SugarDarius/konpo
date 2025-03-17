@@ -16,7 +16,7 @@ export function Composer({ className, ...props }: ComposerRootProps) {
   return (
     <ComposerPrimitive.Root
       className={cn(
-        'relative w-[380px] rounded-lg p-4 bg-background-shadow-sm flex flex-col gap-4',
+        'relative w-[480px] rounded-lg p-4 bg-background-shadow-sm flex flex-col gap-4',
         className
       )}
       {...props}

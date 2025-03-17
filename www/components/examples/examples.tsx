@@ -3,7 +3,7 @@ import { BasicExample1 } from './basics'
 
 export function Examples() {
   return (
-    <div className='flex flex-col gap-2 w-full max-w-3xl items-center'>
+    <div className='flex flex-col gap-2 w-full max-w-[480px] items-center'>
       <BasicExample1 />
       <CodeBlock lang='bash'>npm i konpo</CodeBlock>
       <CodeBlock lang='tsx'>{`
