@@ -227,12 +227,12 @@ export function blurComposerEditor(editor: ComposerEditor): void {
     }
   )
 }
-export function focusKonpoEditor(
+export function focusComposerEditor(
   editor: ComposerEditor,
   resetSelection = true
 ): void {
   ignoreOnThrow(
-    "Failed to clear composer's editor, '<Composer.Root />' may be unmounted.",
+    "Failed to focus composer's editor, '<Composer.Root />' may be unmounted.",
     (): void => {
       if (!SlateReactEditor.isFocused(editor)) {
         SlateTransforms.select(
@@ -295,4 +295,15 @@ export function getComposerEditorActiveSelectionRange(
   }
 
   return domSelection.getRangeAt(0)
+}
+export function discardComposerEditorActiveSelectionRange(
+  editor: ComposerEditor
+): void {
+  ignoreOnThrow(
+    "Failed to discard active selection range, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      SlateTransforms.deselect(editor)
+      selectComposerEditor(editor)
+    }
+  )
 }

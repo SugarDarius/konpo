@@ -162,7 +162,15 @@ const ComposerEditorPlaceholder = ({
  */
 const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
   (
-    { placeholder, autoFocus = false, dir, onFocus, onBlur, ...props },
+    {
+      placeholder,
+      autoFocus = false,
+      dir,
+      onFocus,
+      onBlur,
+      onKeyDown,
+      ...props
+    },
     forwardedRef
   ) => {
     const store = useKonpoStore()
@@ -174,6 +182,9 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
     const focus = useStableCallback(useSelectorKey(store, 'focus'))
     const blur = useStableCallback(useSelectorKey(store, 'blur'))
+    const handleKeyboardKeys = useStableCallback(
+      useSelectorKey(store, 'handleKeyboardKeys')
+    )
 
     const handleChange = useStableCallback(useSelectorKey(store, 'assert'))
     const handleFocus = useStableCallback(
@@ -190,6 +201,13 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
         if (!e.isDefaultPrevented()) {
           blur()
         }
+      }
+    )
+
+    const handleKeyDown = useStableCallback(
+      (e: React.KeyboardEvent<HTMLDivElement>): void => {
+        onKeyDown?.(e)
+        handleKeyboardKeys(e)
       }
     )
 
@@ -244,6 +262,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           renderPlaceholder={renderPlaceholder}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
         />
       </ComposerEditorWrapper>
     )

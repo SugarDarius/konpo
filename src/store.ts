@@ -8,7 +8,7 @@ import {
   blurComposerEditor,
   clearComposerEditor,
   createComposerEditor,
-  focusKonpoEditor,
+  focusComposerEditor,
   isComposerEditorEmpty,
   selectComposerEditor,
   toKonpoComposedBody,
@@ -21,8 +21,10 @@ import {
   type ComposerMark,
   toggleComposerEditorMark,
   getComposerEditorActiveSelectionRange,
+  discardComposerEditorActiveSelectionRange,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
+import { isKey } from './_utils/keyboard'
 
 export type KonpoStore = {
   editor: ComposerEditor
@@ -39,6 +41,8 @@ export type KonpoStore = {
   clear: () => void
   blur: () => void
   toggleMark: (mark: ComposerMark) => void
+  discardActiveSelectionRange: () => void
+  handleKeyboardKeys: (e: React.KeyboardEvent<HTMLDivElement>) => void
   onSubmit: () => void
 }
 
@@ -68,7 +72,7 @@ export function createKonpoStore({
     },
     focus: (resetSelection?: boolean): void => {
       const editor = get().editor
-      focusKonpoEditor(editor, resetSelection)
+      focusComposerEditor(editor, resetSelection)
 
       set({ focused: true })
     },
@@ -96,7 +100,11 @@ export function createKonpoStore({
       const editor = get().editor
       clearComposerEditor(editor)
 
-      set({ canSubmit: false })
+      set({
+        canSubmit: false,
+        activeSelectionRange: null,
+        isSelectionRangeActive: false,
+      })
     },
     blur: (): void => {
       const editor = get().editor
@@ -115,6 +123,34 @@ export function createKonpoStore({
       const selectedMarks = getSelectedComposerEditorMarks(editor)
 
       set({ selectedMarks })
+    },
+    discardActiveSelectionRange: (): void => {
+      set({
+        activeSelectionRange: null,
+        isSelectionRangeActive: false,
+      })
+    },
+    handleKeyboardKeys: (e: React.KeyboardEvent<HTMLDivElement>): void => {
+      const editor = get().editor
+      const isSelectionRangeActive = get().isSelectionRangeActive
+      const discardActiveSelectionRange = get().discardActiveSelectionRange
+
+      const blur = get().blur
+      if (e.isDefaultPrevented()) {
+        return
+      }
+
+      if (isSelectionRangeActive) {
+        if (isKey(e, 'Escape')) {
+          e.preventDefault()
+          discardActiveSelectionRange()
+          discardComposerEditorActiveSelectionRange(editor)
+        }
+      } else {
+        if (isKey(e, 'Escape')) {
+          blur()
+        }
+      }
     },
     onSubmit: (): void => {
       const editor = get().editor
