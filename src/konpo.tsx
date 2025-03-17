@@ -14,6 +14,7 @@ import {
   shift,
   inline,
   autoUpdate,
+  size,
 } from '@floating-ui/react'
 
 import { useIsomorphicLayoutEffect } from './_hooks/use-isomorphic-layout-effect'
@@ -388,7 +389,23 @@ const ComposerFloatingToolbar = forwardRef<
     strategy: 'fixed',
     placement: 'top',
     open: isOpen,
-    middleware: [inline(), flip(), shift()],
+    middleware: [
+      inline(),
+      flip(),
+      shift(),
+      size({
+        apply: ({ availableWidth, availableHeight, elements }) => {
+          elements.floating.style.setProperty(
+            '--konpo-composer-floating-toolbar-available-width',
+            `${availableWidth}px`
+          )
+          elements.floating.style.setProperty(
+            '--konpo-composer-floating-toolbar-available-height',
+            `${availableHeight}px`
+          )
+        },
+      }),
+    ],
     whileElementsMounted: (...args) =>
       autoUpdate(...args, { animationFrame: true }),
   })
