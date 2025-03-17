@@ -6,6 +6,7 @@ import {
   type ComposerEditorProps,
   type ComposerSubmitTriggerProps,
   type ComposerFloatingToolbarProps,
+  type ComposerMarkToggleTriggerProps,
 } from 'konpo'
 
 import { cn } from '@/lib/utils'
@@ -58,5 +59,23 @@ export function ComposerFloatingToolbar({
       className={cn('p-4 rounded-lg bg-muted', className)}
       {...props}
     />
+  )
+}
+
+export function ComposerToggleMarkTrigger({
+  className,
+  mark,
+  children,
+  ...props
+}: ComposerMarkToggleTriggerProps) {
+  return (
+    <ComposerPrimitive.ToggleMarkTrigger
+      mark={mark}
+      {...props}
+      asChild
+      className={cn('', className)}
+    >
+      {children}
+    </ComposerPrimitive.ToggleMarkTrigger>
   )
 }
