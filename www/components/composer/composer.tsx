@@ -56,7 +56,10 @@ export function ComposerFloatingToolbar({
 }: ComposerFloatingToolbarProps) {
   return (
     <ComposerPrimitive.FloatingToolbar
-      className={cn('p-4 rounded-lg bg-muted', className)}
+      className={cn(
+        'p-0 rounded-lg bg-muted overflow-hidden shadow-xs flex flex-row gap-0.5',
+        className
+      )}
       {...props}
     />
   )
@@ -75,7 +78,13 @@ export function ComposerToggleMarkTrigger({
       asChild
       className={cn('', className)}
     >
-      {children}
+      <Button
+        size='icon'
+        variant='ghost'
+        className='data-[active="true"]:bg-primary data-[active="true"]:text-primary-foreground'
+      >
+        {children}
+      </Button>
     </ComposerPrimitive.ToggleMarkTrigger>
   )
 }
