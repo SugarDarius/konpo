@@ -293,43 +293,58 @@ const ComposerSubmitTrigger = forwardRef<
 const ComposerToggleMarkTrigger = forwardRef<
   HTMLButtonElement,
   ComposerMarkToggleTriggerProps
->(({ mark, asChild, onClick, disabled, ...props }, forwardedRef) => {
-  const store = useKonpoStore()
+>(
+  (
+    { mark, asChild, onClick, onPointerDown, disabled, ...props },
+    forwardedRef
+  ) => {
+    const store = useKonpoStore()
 
-  const isComposerDisabled = useSelectorKey(store, 'disabled')
-  const selectedMarks = useSelectorKey(store, 'selectedMarks')
-  const toggleMark = useStableCallback(useSelectorKey(store, 'toggleMark'))
+    const isComposerDisabled = useSelectorKey(store, 'disabled')
+    const selectedMarks = useSelectorKey(store, 'selectedMarks')
+    const toggleMark = useStableCallback(useSelectorKey(store, 'toggleMark'))
 
-  const current = selectedMarks[mark]
+    const current = selectedMarks[mark]
 
-  const handleClick = useStableCallback(
-    (e: React.MouseEvent<HTMLButtonElement>): void => {
-      onClick?.(e)
-      if (!e.isDefaultPrevented()) {
+    const handleClick = useStableCallback(
+      (e: React.MouseEvent<HTMLButtonElement>): void => {
+        onClick?.(e)
+        if (!e.isDefaultPrevented()) {
+          e.preventDefault()
+          e.stopPropagation()
+
+          toggleMark(mark)
+        }
+      }
+    )
+
+    const handlePointerDown = useStableCallback(
+      (e: React.PointerEvent<HTMLButtonElement>): void => {
+        onPointerDown?.(e)
+
         e.preventDefault()
         e.stopPropagation()
-
-        toggleMark(mark)
       }
-    }
-  )
+    )
 
-  const Comp = asChild ? Slot : Primitive.button
-  const isDisabled = isComposerDisabled || disabled
-  const isActive = !isDisabled && current
+    const Comp = asChild ? Slot : Primitive.button
+    const isDisabled = isComposerDisabled || disabled
+    const isActive = !isDisabled && current
 
-  return (
-    <Comp
-      {...props}
-      ref={forwardedRef}
-      onClick={handleClick}
-      disabled={isDisabled}
-      data-active={isActive || undefined}
-      data-disabled={isDisabled || undefined}
-      konpo-toggle-mark-trigger=''
-    />
-  )
-})
+    return (
+      <Comp
+        {...props}
+        ref={forwardedRef}
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        disabled={isDisabled}
+        data-active={isActive || undefined}
+        data-disabled={isDisabled || undefined}
+        konpo-toggle-mark-trigger=''
+      />
+    )
+  }
+)
 
 ComposerRoot.displayName = 'Composer.Root'
 ComposerEditor.displayName = 'Composer.Editor'
