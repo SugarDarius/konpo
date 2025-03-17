@@ -50,6 +50,10 @@ export interface ComposerRootProps
    */
   submitHotkey?: Hotkey
   /**
+   * Hotkey to toggle bold mark.
+   */
+  boldMarkHotkey?: Hotkey
+  /**
    * Composer initial content.
    */
   initialValue?: KonpoComposedBody

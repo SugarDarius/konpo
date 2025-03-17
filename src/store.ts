@@ -37,6 +37,7 @@ export type KonpoStore = {
   isSelectionRangeActive: boolean
   activeSelectionRange: Range | null
   submitHotkey: Hotkey
+  boldMarkHotkey: Hotkey
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -52,11 +53,13 @@ export function createKonpoStore({
   disabled,
   initialValue,
   submitHotkey = 'mod+Enter',
+  boldMarkHotkey = 'mod+b',
   onSubmit,
 }: {
   disabled: boolean
   initialValue?: KonpoComposedBody
   submitHotkey?: Hotkey
+  boldMarkHotkey?: Hotkey
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
@@ -71,6 +74,7 @@ export function createKonpoStore({
     isSelectionRangeActive: false,
     activeSelectionRange: null,
     submitHotkey,
+    boldMarkHotkey,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -144,6 +148,8 @@ export function createKonpoStore({
       const isSelectionRangeActive = get().isSelectionRangeActive
       const discardActiveSelectionRange = get().discardActiveSelectionRange
       const submitHotkey = get().submitHotkey
+      const boldMarkHotkey = get().boldMarkHotkey
+
       const onSubmit = get().onSubmit
 
       const blur = get().blur
@@ -167,6 +173,13 @@ export function createKonpoStore({
       if (isHotKey(submitHotkey, e)) {
         e.preventDefault()
         onSubmit()
+
+        return
+      }
+
+      if (isHotKey(boldMarkHotkey, e)) {
+        e.preventDefault()
+        get().toggleMark('bold')
 
         return
       }
