@@ -11,6 +11,7 @@ import type {
   ComposerRootProps,
   ComposerEditorProps,
   ComposerSubmitTriggerProps,
+  ComposerMarkToggleTriggerProps,
 } from './types'
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
@@ -211,8 +212,8 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           {...props}
           ref={forwardedRef}
           konpo-editable=''
-          data-disabled={disabled}
-          data-focused={focused}
+          data-disabled={disabled || undefined}
+          data-focused={focused || undefined}
           disableDefaultStyles={true}
           style={{
             position: 'relative',
@@ -272,8 +273,60 @@ const ComposerSubmitTrigger = forwardRef<
       {...props}
       ref={forwardedRef}
       disabled={isDisabled}
+      data-disabled={isDisabled || undefined}
       onClick={handleClick}
-      konpo-submit-button=''
+      konpo-submit-trigger=''
+    />
+  )
+})
+
+/**
+ * Adds a mark toggle trigger to the composer.
+ *
+ * This component is responsible for toggling a mark in the editor.
+ * Available marks are: bold, italic, strikethrough, and code.
+ *
+ * @example
+ * ```tsx
+ * <Composer.ToggleMarkTrigger mark='bold'>Bold</Composer.ToggleMarkTrigger>
+ */
+const ComposerToggleMarkTrigger = forwardRef<
+  HTMLButtonElement,
+  ComposerMarkToggleTriggerProps
+>(({ mark, asChild, onClick, disabled, ...props }, forwardedRef) => {
+  const store = useKonpoStore()
+
+  const isComposerDisabled = useSelectorKey(store, 'disabled')
+  const selectedMarks = useSelectorKey(store, 'selectedMarks')
+  const toggleMark = useStableCallback(useSelectorKey(store, 'toggleMark'))
+
+  const current = selectedMarks[mark]
+
+  const handleClick = useStableCallback(
+    (e: React.MouseEvent<HTMLButtonElement>): void => {
+      onClick?.(e)
+      if (!e.isDefaultPrevented()) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        toggleMark(mark)
+      }
+    }
+  )
+
+  const Comp = asChild ? Slot : Primitive.button
+  const isDisabled = isComposerDisabled || disabled
+  const isActive = !isDisabled && current
+
+  return (
+    <Comp
+      {...props}
+      ref={forwardedRef}
+      onClick={handleClick}
+      disabled={isDisabled}
+      data-active={isActive || undefined}
+      data-disabled={isDisabled || undefined}
+      konpo-toggle-mark-trigger=''
     />
   )
 })
@@ -281,9 +334,11 @@ const ComposerSubmitTrigger = forwardRef<
 ComposerRoot.displayName = 'Composer.Root'
 ComposerEditor.displayName = 'Composer.Editor'
 ComposerSubmitTrigger.displayName = 'Composer.ComposerSubmitTrigger'
+ComposerToggleMarkTrigger.displayName = 'Composer.ToggleMarkTrigger'
 
 export {
   ComposerRoot as Root,
   ComposerEditor as Editor,
   ComposerSubmitTrigger as SubmitTrigger,
+  ComposerToggleMarkTrigger as ToggleMarkTrigger,
 }

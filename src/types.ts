@@ -1,5 +1,6 @@
 import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps, ReactNode } from 'react'
+import type { ComposerMark } from './composer-editor'
 
 export type Awaitable<T> = T | Promise<T>
 
@@ -64,3 +65,14 @@ export interface ComposerEditorProps extends DivProps {
 }
 
 export interface ComposerSubmitTriggerProps extends ButtonProps, Children {}
+
+export interface ComposerMarkToggleTriggerProps extends ButtonProps, Children {
+  /**
+   * The mark to toggle
+   */
+  mark: ComposerMark
+  /**
+   * Whether the mark is disabled
+   */
+  disabled?: boolean
+}
