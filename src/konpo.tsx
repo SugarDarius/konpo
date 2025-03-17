@@ -1,10 +1,10 @@
 'use client'
 
 import { forwardRef } from 'react'
-import { createPortal } from 'react-dom'
 
 import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
+import { Portal } from '@radix-ui/react-portal'
 
 import { useIsomorphicLayoutEffect } from './_hooks/use-isomorphic-layout-effect'
 import { useStableCallback } from './_hooks/use-stable-callback'
@@ -370,10 +370,10 @@ const ComposerFloatingToolbar = forwardRef<
 >(({ asChild, ...props }, forwardedRef) => {
   const Comp = asChild ? Slot : Primitive.div
 
-  return createPortal(
-    <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />,
-    document.body,
-    'konpo-floating-toolbar-portal'
+  return (
+    <Portal>
+      <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />
+    </Portal>
   )
 })
 
