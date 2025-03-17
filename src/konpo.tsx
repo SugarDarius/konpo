@@ -233,7 +233,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 const ComposerSubmitButton = forwardRef<
   HTMLButtonElement,
   ComposerSubmitButtonProps
->(({ asChild, disabled, ...props }, forwardedRef) => {
+>(({ asChild, disabled, onClick, ...props }, forwardedRef) => {
   const store = useKonpoStore()
 
   const isComposerDisabled = useSelectorKey(store, 'disabled')
@@ -245,8 +245,10 @@ const ComposerSubmitButton = forwardRef<
 
   const handleClick = useStableCallback(
     (e: React.MouseEvent<HTMLButtonElement>): void => {
-      e.preventDefault()
-      onSubmit()
+      onClick?.(e)
+      if (!e.isDefaultPrevented()) {
+        onSubmit()
+      }
     }
   )
 
