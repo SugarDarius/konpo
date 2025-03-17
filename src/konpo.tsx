@@ -1,6 +1,8 @@
 'use client'
 
 import { forwardRef } from 'react'
+import { createPortal } from 'react-dom'
+
 import { Primitive } from '@radix-ui/react-primitive'
 import { Slottable, Slot } from '@radix-ui/react-slot'
 
@@ -12,6 +14,7 @@ import type {
   ComposerEditorProps,
   ComposerSubmitTriggerProps,
   ComposerMarkToggleTriggerProps,
+  ComposerFloatingToolbarProps,
 } from './types'
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
@@ -346,14 +349,44 @@ const ComposerToggleMarkTrigger = forwardRef<
   }
 )
 
+/**
+ * Adds a floating toolbar to the composer.
+ * It will be rendered outside the root of the composer thanks to a portal.
+ *
+ * @example
+ * ```tsx
+ * <Composer.Root>
+ *  <Composer.FloatingToolbar>
+ *    <Composer.ToggleMarkTrigger mark='bold'>Bold</Composer.ToggleMarkTrigger>
+ *    <Composer.ToggleMarkTrigger mark='italic'>Italic</Composer.ToggleMarkTrigger>
+ *    <Composer.ToggleMarkTrigger mark='strikethrough'>Strikethrough</Composer.ToggleMarkTrigger>
+ *    <Composer.ToggleMarkTrigger mark='code'>Code</Composer.ToggleMarkTrigger>
+ *  </Composer.FloatingToolbar>
+ * </Composer.Root />
+ */
+const ComposerFloatingToolbar = forwardRef<
+  HTMLDivElement,
+  ComposerFloatingToolbarProps
+>(({ asChild, ...props }, forwardedRef) => {
+  const Comp = asChild ? Slot : Primitive.div
+
+  return createPortal(
+    <Comp {...props} ref={forwardedRef} konpo-floating-toolbar='' />,
+    document.body,
+    'konpo-floating-toolbar'
+  )
+})
+
 ComposerRoot.displayName = 'Composer.Root'
 ComposerEditor.displayName = 'Composer.Editor'
 ComposerSubmitTrigger.displayName = 'Composer.ComposerSubmitTrigger'
 ComposerToggleMarkTrigger.displayName = 'Composer.ToggleMarkTrigger'
+ComposerFloatingToolbar.displayName = 'Composer.FloatingToolbar'
 
 export {
   ComposerRoot as Root,
   ComposerEditor as Editor,
   ComposerSubmitTrigger as SubmitTrigger,
   ComposerToggleMarkTrigger as ToggleMarkTrigger,
+  ComposerFloatingToolbar as FloatingToolbar,
 }

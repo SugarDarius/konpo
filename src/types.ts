@@ -76,3 +76,5 @@ export interface ComposerMarkToggleTriggerProps extends ButtonProps, Children {
    */
   disabled?: boolean
 }
+
+export interface ComposerFloatingToolbarProps extends DivProps, Children {}
