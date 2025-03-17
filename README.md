@@ -19,7 +19,7 @@ export function CommentComposer() {
   return (
     <Composer.Root>
       <Composer.Editor />
-      <Composer.SubmitButton />
+      <Composer.SubmitTrigger />
     </Composer.Root>
   )
 }
