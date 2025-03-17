@@ -69,6 +69,8 @@ export function createKonpoStore({
     focus: (resetSelection?: boolean): void => {
       const editor = get().editor
       focusKonpoEditor(editor, resetSelection)
+
+      set({ focused: true })
     },
     assert: (): void => {
       const editor = get().editor
@@ -97,6 +99,12 @@ export function createKonpoStore({
     blur: (): void => {
       const editor = get().editor
       blurComposerEditor(editor)
+
+      set({
+        focused: false,
+        activeSelectionRange: null,
+        isSelectionRangeActive: false,
+      })
     },
     toggleMark: (mark: ComposerMark): void => {
       const editor = get().editor

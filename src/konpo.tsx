@@ -173,13 +173,14 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 
     const initialValue = useInitial(useSelectorKey(store, 'initialValue'))
     const focus = useStableCallback(useSelectorKey(store, 'focus'))
+    const blur = useStableCallback(useSelectorKey(store, 'blur'))
 
     const handleChange = useStableCallback(useSelectorKey(store, 'assert'))
     const handleFocus = useStableCallback(
       (e: React.FocusEvent<HTMLDivElement>) => {
         onFocus?.(e)
         if (!e.isDefaultPrevented()) {
-          store.set({ focused: true })
+          focus()
         }
       }
     )
@@ -187,7 +188,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
       (e: React.FocusEvent<HTMLDivElement>) => {
         onBlur?.(e)
         if (!e.isDefaultPrevented()) {
-          store.set({ focused: false })
+          blur()
         }
       }
     )
