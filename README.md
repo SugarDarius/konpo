@@ -1,7 +1,7 @@
-A fast, unstyled, and composable comment composer React component.
+A fast, unstyled, and composable composer React component.
 
-- 🎨 Unstyled and composable, use your own styles as you want.
-- 🧩 Composable and clean API, compose it as you think.
+- 🎨 Unstyled, use your own styles as you want.
+- 🧩 Composable and clean API, compose it as you think it.
 - 🧠 Focused functionalities, use only features you want.
 
 # Install
@@ -15,7 +15,7 @@ npm i konpo
 ```tsx
 import { Composer } from 'konpo'
 
-export function CommentComposer() {
+export function ComposableComposer() {
   return (
     <Composer.Root>
       <Composer.Editor />

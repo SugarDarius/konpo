@@ -9,7 +9,7 @@ export function Examples() {
       <CodeBlock lang='tsx'>{`
         import { Composer } from 'konpo'
 
-        export function CommentComposer() {
+        export function ComposableComposer() {
           return (
             <Composer.Root>
               <Composer.Editor />

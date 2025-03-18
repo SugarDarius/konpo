@@ -1,7 +1,7 @@
 {
   "name": "konpo",
   "version": "0.1.0",
-  "description": "A fast, unstyled, and composable comment composer React component.",
+  "description": "A fast, unstyled, and composable composer React component.",
   "license": "MIT",
   "packageManager": "npm@11.2.0",
   "workspaces": [
