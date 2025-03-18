@@ -15,7 +15,9 @@ export function Examples() {
               <Composer.Editor 
                 autoFocus
                 placeholder='Write a message'
-                Link={Composer.Link}
+                components={{
+                  Link: Composer.Link
+                }}
               />
               <Composer.FloatingToolbar>
                 <Composer.ToggleMarkTrigger>

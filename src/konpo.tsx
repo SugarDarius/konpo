@@ -121,15 +121,18 @@ const ComposerLink = forwardRef<HTMLAnchorElement, ComposerLinkProps>(
 
 interface ComposerEditorElementProps
   extends ComposerEditorEditableRenderElementProps {
-  LinkPrimitive: React.ComponentType<ComposerLinkProps>
+  components?: {
+    Link?: React.ComponentType<ComposerLinkProps>
+  }
 }
 
 const ComposerEditorElement = ({
   element,
   attributes,
   children,
-  LinkPrimitive,
+  components = {},
 }: ComposerEditorElementProps) => {
+  const { Link = ComposerLink } = components
   switch (element.type) {
     case 'paragraph':
       return (
@@ -144,7 +147,7 @@ const ComposerEditorElement = ({
     case 'link':
       return (
         <Primitive.span {...attributes}>
-          <LinkPrimitive href={element.url}>{children}</LinkPrimitive>
+          <Link href={element.url}>{children}</Link>
         </Primitive.span>
       )
     default:
@@ -210,7 +213,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
       placeholder,
       autoFocus = false,
       dir,
-      Link: LinkPrimitive = ComposerLink,
+      components,
       onFocus,
       onBlur,
       onKeyDown,
@@ -258,7 +261,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 
     const renderElement = useStableCallback(
       (props: ComposerEditorEditableRenderElementProps) => (
-        <ComposerEditorElement {...props} LinkPrimitive={LinkPrimitive} />
+        <ComposerEditorElement {...props} components={components} />
       )
     )
 

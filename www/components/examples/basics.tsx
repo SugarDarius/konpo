@@ -18,7 +18,9 @@ export function BasicExample1() {
       <ComposerEditor
         autoFocus
         placeholder='Write a message'
-        Link={ComposerLink}
+        components={{
+          Link: ComposerLink,
+        }}
       />
       <ComposerFloatingToolbar>
         <ComposerToggleMarkTrigger mark='bold'>

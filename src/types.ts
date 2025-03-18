@@ -118,9 +118,15 @@ export interface ComposerEditorProps extends DivProps {
    */
   dir?: Direction
   /**
-   * The Link component primitive to use to display links inside the editor.
+   * Components to use inside the editor to render specific elements
+   * such as links
    */
-  Link?: React.ComponentType<ComposerLinkProps>
+  components?: {
+    /**
+     * The Link component primitive to use to display links inside the editor.
+     */
+    Link?: React.ComponentType<ComposerLinkProps>
+  }
 }
 
 export interface ComposerSubmitTriggerProps extends ButtonProps, Children {}
