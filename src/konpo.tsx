@@ -32,7 +32,7 @@ import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
 import {
   ComposerEditorEditable,
-  ComposerEditorWrapper,
+  ComposerEditorComponent,
   type ComposerEditorEditableRenderElementProps,
   type ComposerEditorEditableRenderLeafProps,
   type ComposerEditorEditableRenderPlaceholderProps,
@@ -245,7 +245,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
     }, [autoFocus, focus])
 
     return (
-      <ComposerEditorWrapper
+      <ComposerEditorComponent
         editor={editor}
         initialValue={initialValue}
         onChange={handleChange}
@@ -273,7 +273,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
         />
-      </ComposerEditorWrapper>
+      </ComposerEditorComponent>
     )
   }
 )

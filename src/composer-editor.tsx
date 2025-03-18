@@ -1,21 +1,23 @@
 import {
+  type BaseEditor,
+  type Element,
+  type Descendant,
   createEditor as createSlateEditor,
   Editor as SlateEditor,
   Transforms as SlateTransforms,
   Range as SlateRange,
-  type BaseEditor,
-  type Element,
-  type Descendant,
+  Element as SlateElement,
+  Node as SlateNode,
 } from 'slate'
 import { withHistory, type HistoryEditor } from 'slate-history'
 import {
   withReact,
   type ReactEditor,
   type RenderElementProps,
-  Slate,
-  Editable,
   type RenderLeafProps,
   type RenderPlaceholderProps,
+  Slate as SlateComponent,
+  Editable as SlateEditableComponent,
   ReactEditor as SlateReactEditor,
 } from 'slate-react'
 
@@ -62,23 +64,46 @@ declare module 'slate-react' {
   > & { element: E }
 }
 
-export function createComposerEditor() {
-  return withHistory(withReact(createSlateEditor()))
+const withNormalizer = (editor: SlateEditor): SlateEditor => {
+  const { normalizeNode: baseNormalizeNode } = editor
+
+  editor.normalizeNode = ([node, path]): void => {
+    // Paragraphs must always contain only inline elements
+    if (SlateElement.isElement(node) && node.type === 'paragraph') {
+      for (const [child, childPath] of SlateNode.children(editor, path)) {
+        if (SlateElement.isElement(child) && !editor.isInline(child)) {
+          SlateTransforms.unwrapNodes(editor, { at: childPath })
+          return
+        }
+      }
+    }
+    // TODO: handle other blocks elements like links, mentions and lists
+
+    baseNormalizeNode([node, path])
+  }
+
+  return editor
+}
+
+export function createComposerEditor(): SlateEditor {
+  return withNormalizer(withHistory(withReact(createSlateEditor())))
 }
 
 export type ComposerEditor = ReturnType<typeof createComposerEditor>
 export type ComposerEditorDescendant = Descendant
 
-export const ComposerEditorWrapper = (props: {
+export const ComposerEditorComponent = (props: {
   editor: ComposerEditor
   initialValue: ComposerEditorDescendant[]
   onChange: (value: ComposerEditorDescendant[]) => void
   children: React.ReactNode
-}) => <Slate {...props} />
+}) => <SlateComponent {...props} />
 
-type ComposerEditorEditableProps = React.ComponentProps<typeof Editable>
+type ComposerEditorEditableProps = React.ComponentProps<
+  typeof SlateEditableComponent
+>
 export const ComposerEditorEditable = (props: ComposerEditorEditableProps) => (
-  <Editable {...props} />
+  <SlateEditableComponent {...props} />
 )
 
 // TODO: add more properties like mentions, links, etc.
