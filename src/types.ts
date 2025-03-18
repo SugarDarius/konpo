@@ -17,7 +17,7 @@ export type KonpoText = {
 export type KonpoLink = {
   type: 'link'
   url: string
-  children: KonpoText[]
+  text: string
 }
 
 export type KonpoInlineElement = KonpoLink | KonpoText

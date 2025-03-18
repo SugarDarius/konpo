@@ -271,7 +271,11 @@ export function toComposerEditorDescendants(
           }
 
           if (isKonpoLink(inline)) {
-            return { ...inline }
+            return {
+              type: 'link',
+              url: inline.url,
+              children: [{ text: inline.text }],
+            }
           }
 
           return null
@@ -320,7 +324,11 @@ export function toKonpoComposedBody(
                 }
 
                 if (isComposerLink(inline)) {
-                  return { ...inline }
+                  return {
+                    type: 'link',
+                    url: inline.url,
+                    text: inline.children[0]?.text ?? '',
+                  }
                 }
 
                 return null
