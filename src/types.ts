@@ -1,7 +1,7 @@
 import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps, ReactNode } from 'react'
 
-import type { Hotkey } from './_utils/keyboard'
+import type { Hotkeys } from './_utils/keyboard'
 import type { ComposerMark } from './composer-editor'
 
 export type Awaitable<T> = T | Promise<T>
@@ -48,11 +48,11 @@ export interface ComposerRootProps
   /**
    * Hotkey to submit the composer.
    */
-  submitHotkey?: Hotkey
+  submitHotkeys?: Hotkeys
   /**
    * Hotkey to toggle bold mark.
    */
-  boldMarkHotkey?: Hotkey
+  boldMarkHotkeys?: Hotkeys
   /**
    * Composer initial content.
    */

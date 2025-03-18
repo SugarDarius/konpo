@@ -59,7 +59,8 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
       onSubmit,
       disabled = false,
       initialValue,
-      submitHotkey,
+      submitHotkeys,
+      boldMarkHotkeys,
       children,
       ...props
     },
@@ -76,7 +77,8 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
       createKonpoStore({
         disabled,
         initialValue,
-        submitHotkey,
+        submitHotkeys,
+        boldMarkHotkeys,
         onSubmit: onSubmitStable,
       })
     )

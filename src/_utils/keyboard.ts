@@ -1,14 +1,14 @@
-export type Hotkey = string | string[]
+export type Hotkeys = string | string[]
 
 type Modifier = 'alt' | 'ctrl' | 'meta' | 'shift' | 'mod'
-type ParsedHotkey = Record<Modifier, boolean> & { key: string }
+type ParsedHotkeys = Record<Modifier, boolean> & { key: string }
 
 const isApple = () =>
   typeof window !== 'undefined' &&
   /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
 
-const parseHotkey = (hotkey: string): ParsedHotkey => {
-  const keys = hotkey.split('+')
+const parseHotkeys = (hotkeys: string): ParsedHotkeys => {
+  const keys = hotkeys.split('+')
   const result = {
     alt: false,
     ctrl: false,
@@ -49,14 +49,14 @@ const parseHotkey = (hotkey: string): ParsedHotkey => {
   return result
 }
 
-export function isHotKey(
-  hotkey: Hotkey,
+export function isHotKeys(
+  hotkeys: Hotkeys,
   event: KeyboardEvent | React.KeyboardEvent
 ): boolean {
-  if (Array.isArray(hotkey)) {
-    return hotkey.some((k) => isHotKey(k, event))
+  if (Array.isArray(hotkeys)) {
+    return hotkeys.some((k) => isHotKeys(k, event))
   }
-  const parsed = parseHotkey(hotkey)
+  const parsed = parseHotkeys(hotkeys)
 
   if (parsed.alt !== event.altKey) return false
   if (parsed.ctrl !== event.ctrlKey) return false

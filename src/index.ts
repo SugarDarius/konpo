@@ -1,3 +1,5 @@
+export type { Hotkeys } from './_utils/keyboard'
+export type { ComposerMark } from './composer-editor'
 export type {
   Awaitable,
   ComposerRootProps,
@@ -11,5 +13,4 @@ export type {
   KonpoBlockElement,
   KonpoComposedBody,
 } from './types'
-export type { ComposerMark } from './composer-editor'
 export * as Composer from './konpo'

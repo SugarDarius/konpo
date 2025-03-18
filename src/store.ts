@@ -25,7 +25,7 @@ import {
   clearComposerEditorMarks,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
-import { type Hotkey, isHotKey } from './_utils/keyboard'
+import { type Hotkeys, isHotKeys } from './_utils/keyboard'
 
 export type KonpoStore = {
   editor: ComposerEditor
@@ -36,8 +36,8 @@ export type KonpoStore = {
   selectedMarks: ComposerMarks
   isSelectionRangeActive: boolean
   activeSelectionRange: Range | null
-  submitHotkey: Hotkey
-  boldMarkHotkey: Hotkey
+  submitHotkeys: Hotkeys
+  boldMarkHotkeys: Hotkeys
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -52,14 +52,14 @@ export type KonpoStore = {
 export function createKonpoStore({
   disabled,
   initialValue,
-  submitHotkey = 'mod+Enter',
-  boldMarkHotkey = 'mod+b',
+  submitHotkeys = 'mod+Enter',
+  boldMarkHotkeys = 'mod+b',
   onSubmit,
 }: {
   disabled: boolean
   initialValue?: KonpoComposedBody
-  submitHotkey?: Hotkey
-  boldMarkHotkey?: Hotkey
+  submitHotkeys?: Hotkeys
+  boldMarkHotkeys?: Hotkeys
   onSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
@@ -73,8 +73,8 @@ export function createKonpoStore({
     selectedMarks: baseComposerMarks,
     isSelectionRangeActive: false,
     activeSelectionRange: null,
-    submitHotkey,
-    boldMarkHotkey,
+    submitHotkeys,
+    boldMarkHotkeys,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -151,7 +151,7 @@ export function createKonpoStore({
         return
       }
 
-      if (isHotKey('Escape', e)) {
+      if (isHotKeys('Escape', e)) {
         if (state.isSelectionRangeActive) {
           e.preventDefault()
 
@@ -164,14 +164,14 @@ export function createKonpoStore({
         return
       }
 
-      if (isHotKey(state.submitHotkey, e)) {
+      if (isHotKeys(state.submitHotkeys, e)) {
         e.preventDefault()
         state.onSubmit()
 
         return
       }
 
-      if (isHotKey(state.boldMarkHotkey, e)) {
+      if (isHotKeys(state.boldMarkHotkeys, e)) {
         e.preventDefault()
         state.toggleMark('bold')
 
