@@ -43,6 +43,18 @@ export type ComposerShortcuts = {
    * Hotkeys to toggle bold mark.
    */
   boldMark?: Hotkeys
+  /**
+   * Hotkeys to toggle italic mark.
+   */
+  italicMark?: Hotkeys
+  /**
+   * Hotkeys to toggle strikethrough mark.
+   */
+  strikethroughMark?: Hotkeys
+  /**
+   * Hotkeys to toggle code mark.
+   */
+  codeMark?: Hotkeys
 }
 
 export interface ComposerRootProps

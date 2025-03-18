@@ -77,6 +77,9 @@ export function createKonpoStore({
     shortcuts: {
       submit: initialShortcuts?.submit ?? 'mod+Enter',
       boldMark: initialShortcuts?.boldMark ?? 'mod+b',
+      italicMark: initialShortcuts?.italicMark ?? 'mod+i',
+      strikethroughMark: initialShortcuts?.strikethroughMark ?? 'mod++shift+s',
+      codeMark: initialShortcuts?.codeMark ?? 'mod+e',
     },
     select: (): void => {
       const editor = get().editor
@@ -179,6 +182,25 @@ export function createKonpoStore({
         state.toggleMark('bold')
 
         return
+      }
+
+      if (isHotKeys(state.shortcuts.italicMark, e)) {
+        e.preventDefault()
+        state.toggleMark('italic')
+
+        return
+      }
+
+      if (isHotKeys(state.shortcuts.strikethroughMark, e)) {
+        e.preventDefault()
+        state.toggleMark('strikethrough')
+
+        return
+      }
+
+      if (isHotKeys(state.shortcuts.codeMark, e)) {
+        e.preventDefault()
+        state.toggleMark('code')
       }
     },
     onSubmit: (): void => {
