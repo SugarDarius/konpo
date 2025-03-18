@@ -22,7 +22,7 @@ import {
 } from 'slate-react'
 
 import { exists } from './_utils/identity'
-import { isEmptyString } from './_utils/string'
+import { isEmptyString, isUrl } from './_utils/string'
 import type {
   KonpoParagraphElement,
   KonpoInlineElement,
@@ -148,10 +148,9 @@ const wrapComposerLink = (
   }
 }
 
-const withInlines = (editor: ComposerEditor): ComposerEditor => {
+const withAutoLink = (editor: ComposerEditor): ComposerEditor => {
   const {
     isInline: baseIsInline,
-    isSelectable: baseIsSelectable,
     insertText: baseInsertText,
     insertData: baseInsertData,
   } = editor
@@ -159,21 +158,45 @@ const withInlines = (editor: ComposerEditor): ComposerEditor => {
   editor.isInline = (element) => {
     return element.type === 'link' || baseIsInline(element)
   }
-  editor.isSelectable = (element) => {
-    return element.type === 'link' || baseIsSelectable(element)
-  }
+
   editor.insertText = (text) => {
-    // TODO: update url check
-    if (text && text.startsWith('http')) {
-      wrapComposerLink(editor, text)
-    } else {
-      baseInsertText(text)
+    if (
+      text === ' ' &&
+      editor.selection &&
+      SlateRange.isCollapsed(editor.selection)
+    ) {
+      const [start] = SlateRange.edges(editor.selection)
+      const beforeRange = SlateEditor.range(
+        editor,
+        { path: start.path, offset: 0 },
+        start
+      )
+      const beforeText = SlateEditor.string(editor, beforeRange)
+      const matches = beforeText.match(/(\S+)$/)
+
+      if (matches && matches[1] && isUrl(matches[1])) {
+        const url = matches[1]
+        baseInsertText(text)
+
+        SlateTransforms.move(editor, { distance: 1, reverse: true })
+        SlateTransforms.select(editor, {
+          anchor: { path: start.path, offset: start.offset - url.length },
+          focus: { path: start.path, offset: start.offset },
+        })
+
+        wrapComposerLink(editor, url)
+        SlateTransforms.move(editor)
+
+        return
+      }
     }
+
+    baseInsertText(text)
   }
+
   editor.insertData = (data) => {
     const text = data.getData('text/plain')
-    // TODO: update url check
-    if (text && text.startsWith('http')) {
+    if (text && isUrl(text)) {
       wrapComposerLink(editor, text)
     } else {
       baseInsertData(data)
@@ -185,7 +208,7 @@ const withInlines = (editor: ComposerEditor): ComposerEditor => {
 
 export function createComposerEditor(): ComposerEditor {
   return withNormalizer(
-    withHistory(withInlines(withReact(createSlateEditor() as ComposerEditor)))
+    withHistory(withAutoLink(withReact(createSlateEditor() as ComposerEditor)))
   )
 }
 
