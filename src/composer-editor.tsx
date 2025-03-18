@@ -362,6 +362,10 @@ export function isComposerEditorEmpty(
       if (!isComposerEditorEmpty(editor, descendant.children)) {
         return false
       }
+    } else {
+      if (!SlateEditor.isEmpty(editor, descendant)) {
+        return false
+      }
     }
   }
 
