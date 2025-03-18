@@ -22,6 +22,7 @@ import { useStableCallback } from './_hooks/use-stable-callback'
 
 import type {
   ComposerRootProps,
+  ComposerLinkProps,
   ComposerEditorProps,
   ComposerSubmitTriggerProps,
   ComposerMarkToggleTriggerProps,
@@ -96,11 +97,39 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   }
 )
 
+/**
+ * Adds a link to the composer.
+ *
+ * @example
+ * ```tsx
+ * <Composer.Link href='https://example.com'>Example</Composer.Link>
+ */
+const ComposerLink = forwardRef<HTMLAnchorElement, ComposerLinkProps>(
+  ({ asChild, ...props }, forwardedRef) => {
+    const Comp = asChild ? Slot : Primitive.a
+    return (
+      <Comp
+        {...props}
+        ref={forwardedRef}
+        target='_blank'
+        rel='noopener noreferrer nofollow'
+        konpo-link=''
+      />
+    )
+  }
+)
+
+interface ComposerEditorElementProps
+  extends ComposerEditorEditableRenderElementProps {
+  LinkPrimitive: React.ComponentType<ComposerLinkProps>
+}
+
 const ComposerEditorElement = ({
   element,
   attributes,
   children,
-}: ComposerEditorEditableRenderElementProps) => {
+  LinkPrimitive,
+}: ComposerEditorElementProps) => {
   switch (element.type) {
     case 'paragraph':
       return (
@@ -114,15 +143,9 @@ const ComposerEditorElement = ({
       )
     case 'link':
       return (
-        <Primitive.a
-          {...attributes}
-          konpo-link=''
-          href={element.url}
-          target='_blank'
-          rel='noopener noreferrer nofollow'
-        >
-          {children}
-        </Primitive.a>
+        <Primitive.span {...attributes}>
+          <LinkPrimitive href={element.url}>{children}</LinkPrimitive>
+        </Primitive.span>
       )
     default:
       return null
@@ -187,6 +210,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
       placeholder,
       autoFocus = false,
       dir,
+      Link: LinkPrimitive = ComposerLink,
       onFocus,
       onBlur,
       onKeyDown,
@@ -234,7 +258,7 @@ const ComposerEditor = forwardRef<HTMLDivElement, ComposerEditorProps>(
 
     const renderElement = useStableCallback(
       (props: ComposerEditorEditableRenderElementProps) => (
-        <ComposerEditorElement {...props} />
+        <ComposerEditorElement {...props} LinkPrimitive={LinkPrimitive} />
       )
     )
 
@@ -494,6 +518,7 @@ ComposerFloatingToolbar.displayName = 'Composer.FloatingToolbar'
 
 export {
   ComposerRoot as Root,
+  ComposerLink as Link,
   ComposerEditor as Editor,
   ComposerSubmitTrigger as SubmitTrigger,
   ComposerToggleMarkTrigger as ToggleMarkTrigger,

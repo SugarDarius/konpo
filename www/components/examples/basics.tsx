@@ -4,6 +4,7 @@ import { Bold, Italic, Code, Strikethrough } from 'lucide-react'
 
 import {
   Composer,
+  ComposerLink,
   ComposerEditor,
   ComposerSubmitTrigger,
   ComposerFloatingToolbar,
@@ -14,7 +15,11 @@ import { Separator } from '@/components/ui/separator'
 export function BasicExample1() {
   return (
     <Composer onSubmit={(body) => console.log(body)}>
-      <ComposerEditor autoFocus placeholder='Write a message' />
+      <ComposerEditor
+        autoFocus
+        placeholder='Write a message'
+        Link={ComposerLink}
+      />
       <ComposerFloatingToolbar>
         <ComposerToggleMarkTrigger mark='bold'>
           <Bold className='size-4' />

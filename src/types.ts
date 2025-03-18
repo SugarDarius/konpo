@@ -37,6 +37,7 @@ export type Children = { children?: ReactNode }
 
 export type DivProps = ComponentProps<typeof Primitive.div>
 export type ButtonProps = ComponentProps<typeof Primitive.button>
+export type AnchorProps = ComponentProps<typeof Primitive.a>
 
 export type Direction = 'ltr' | 'rtl'
 
@@ -99,6 +100,8 @@ export interface ComposerRootProps
   onSubmit?: (body: KonpoComposedBody) => Awaitable<void>
 }
 
+export interface ComposerLinkProps extends AnchorProps, Children {}
+
 export interface ComposerEditorProps extends DivProps {
   /**
    * Placeholder text when the editor is empty.
@@ -114,6 +117,10 @@ export interface ComposerEditorProps extends DivProps {
    * Reading direction of the editor.
    */
   dir?: Direction
+  /**
+   * The Link component primitive to use to display links inside the editor.
+   */
+  Link?: React.ComponentType<ComposerLinkProps>
 }
 
 export interface ComposerSubmitTriggerProps extends ButtonProps, Children {}

@@ -3,6 +3,7 @@
 import {
   Composer as ComposerPrimitive,
   type ComposerRootProps,
+  type ComposerLinkProps,
   type ComposerEditorProps,
   type ComposerSubmitTriggerProps,
   type ComposerFloatingToolbarProps,
@@ -24,12 +25,20 @@ export function Composer({ className, ...props }: ComposerRootProps) {
   )
 }
 
+export function ComposerLink({ className, ...props }: ComposerLinkProps) {
+  return (
+    <ComposerPrimitive.Link
+      className={cn('underline underline-offset-2 text-cyan-600', className)}
+      {...props}
+    />
+  )
+}
+
 export function ComposerEditor({ className, ...props }: ComposerEditorProps) {
   return (
     <ComposerPrimitive.Editor
       className={cn(
         'rounded-md border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-16 w-full resize-none border-0 focus-visible:ring-1 bg-gray-50 dark:bg-gray-900',
-        '[&_[konpo-link]]:underline [&_[konpo-link]]:underline-offset-2 [&_[konpo-link]]:text-cyan-600',
         '[&_[konpo-inline-text]_code]:bg-gray-300 [&_[konpo-inline-text]_code]:p-0.5 [&_[konpo-inline-text]_code]:rounded-sm',
         className
       )}

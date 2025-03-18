@@ -3,6 +3,7 @@ export type {
   Awaitable,
   ComposerShortcuts,
   ComposerRootProps,
+  ComposerLinkProps,
   ComposerEditorProps,
   ComposerSubmitTriggerProps,
   ComposerMarkToggleTriggerProps,
