@@ -56,9 +56,12 @@ export type ComposerParagraphElement = {
 export type ComposerMark = keyof Omit<ComposerText, 'text'>
 export type ComposerMarks = Record<ComposerMark, boolean>
 
+export type ComposerEditor = BaseEditor & ReactEditor & HistoryEditor
+export type ComposerEditorDescendant = Descendant
+
 declare module 'slate' {
   interface CustomTypes {
-    Editor: BaseEditor & ReactEditor & HistoryEditor
+    Editor: ComposerEditor
     Element: ComposerParagraphElement | ComposerLink
     Text: ComposerText
   }
@@ -71,7 +74,7 @@ declare module 'slate-react' {
   > & { element: E }
 }
 
-const withNormalizer = (editor: SlateEditor): SlateEditor => {
+const withNormalizer = (editor: ComposerEditor): ComposerEditor => {
   const { normalizeNode: baseNormalizeNode } = editor
 
   editor.normalizeNode = ([node, path]): void => {
@@ -84,7 +87,15 @@ const withNormalizer = (editor: SlateEditor): SlateEditor => {
         }
       }
     }
-    // TODO: handle other blocks elements like links, mentions and lists
+    // Links cannot be nested nor empty
+    if (SlateElement.isElement(node) && node.type === 'link') {
+      if (
+        node.children.length <= 0 ||
+        (node.children.length === 1 && node.children[0]?.text === '')
+      ) {
+        SlateTransforms.removeNodes(editor, { at: path })
+      }
+    }
 
     baseNormalizeNode([node, path])
   }
@@ -92,12 +103,91 @@ const withNormalizer = (editor: SlateEditor): SlateEditor => {
   return editor
 }
 
-export function createComposerEditor(): SlateEditor {
-  return withNormalizer(withHistory(withReact(createSlateEditor())))
+export function isComposerLinkActive(editor: ComposerEditor): boolean {
+  const [link] = SlateEditor.nodes(editor, {
+    match: (n) =>
+      !SlateEditor.isEditor(n) &&
+      SlateElement.isElement(n) &&
+      n.type === 'link',
+  })
+
+  return !!link
 }
 
-export type ComposerEditor = ReturnType<typeof createComposerEditor>
-export type ComposerEditorDescendant = Descendant
+const unwrapLink = (editor: ComposerEditor) => {
+  SlateTransforms.unwrapNodes(editor, {
+    match: (n) =>
+      !SlateEditor.isEditor(n) &&
+      SlateElement.isElement(n) &&
+      n.type === 'link',
+  })
+}
+
+const wrapComposerLink = (
+  editor: ComposerEditor,
+  url: string,
+  text?: string
+): void => {
+  if (isComposerLinkActive(editor)) {
+    unwrapLink(editor)
+  }
+
+  const selection = editor.selection
+  const isCollapsed = selection && SlateRange.isCollapsed(selection)
+  const link: ComposerLink = {
+    type: 'link',
+    url,
+    children: isCollapsed ? [{ text: text ?? url }] : [],
+  }
+
+  if (isCollapsed) {
+    SlateTransforms.insertNodes(editor, link)
+  } else {
+    SlateTransforms.wrapNodes(editor, link, { split: true })
+    SlateTransforms.collapse(editor, { edge: 'end' })
+  }
+}
+
+const withInlines = (editor: ComposerEditor): ComposerEditor => {
+  const {
+    isInline: baseIsInline,
+    isSelectable: baseIsSelectable,
+    insertText: baseInsertText,
+    insertData: baseInsertData,
+  } = editor
+
+  editor.isInline = (element) => {
+    return element.type === 'link' || baseIsInline(element)
+  }
+  editor.isSelectable = (element) => {
+    return element.type === 'link' || baseIsSelectable(element)
+  }
+  editor.insertText = (text) => {
+    // TODO: update url check
+    if (text && text.startsWith('http')) {
+      wrapComposerLink(editor, text)
+    } else {
+      baseInsertText(text)
+    }
+  }
+  editor.insertData = (data) => {
+    const text = data.getData('text/plain')
+    // TODO: update url check
+    if (text && text.startsWith('http')) {
+      wrapComposerLink(editor, text)
+    } else {
+      baseInsertData(data)
+    }
+  }
+
+  return editor
+}
+
+export function createComposerEditor(): ComposerEditor {
+  return withNormalizer(
+    withHistory(withInlines(withReact(createSlateEditor() as ComposerEditor)))
+  )
+}
 
 export const ComposerEditorComponent = (props: {
   editor: ComposerEditor
@@ -347,7 +437,7 @@ export function clearComposerEditorMarks(editor: ComposerEditor): void {
   )
 }
 export function getComposerEditorActiveSelectionRange(
-  editor: SlateEditor,
+  editor: ComposerEditor,
   domSelection: Selection | null
 ): Range | null {
   const selection = editor.selection
