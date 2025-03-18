@@ -24,8 +24,9 @@ import {
 import { exists } from './_utils/identity'
 import { isEmptyString } from './_utils/string'
 import type {
-  KonpoInlineElement,
   KonpoParagraphElement,
+  KonpoInlineElement,
+  KonpoLink,
   KonpoText,
   KonpoComposedBody,
   KonpoBlockElement,
@@ -40,7 +41,13 @@ export type ComposerText = {
   text: string
 }
 
-export type ComposerInlineElement = ComposerText
+export type ComposerLink = {
+  type: 'link'
+  url: string
+  children: ComposerText[]
+}
+
+export type ComposerInlineElement = ComposerLink | ComposerText
 export type ComposerParagraphElement = {
   type: 'paragraph'
   children: ComposerInlineElement[]
@@ -52,7 +59,7 @@ export type ComposerMarks = Record<ComposerMark, boolean>
 declare module 'slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor & HistoryEditor
-    Element: ComposerParagraphElement
+    Element: ComposerParagraphElement | ComposerLink
     Text: ComposerText
   }
 }
@@ -120,7 +127,16 @@ export interface ComposerEditorEditableRenderPlaceholderProps
   extends RenderPlaceholderProps {}
 
 const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
-  inline.text !== undefined && typeof inline.text === 'string'
+  !('type' in inline) &&
+  inline.text !== undefined &&
+  typeof inline.text === 'string'
+
+const isKonpoLink = (inline: KonpoInlineElement): inline is KonpoLink =>
+  'type' in inline && inline.type === 'link'
+
+const isKonpoParagraphElement = (
+  element: KonpoBlockElement
+): element is KonpoParagraphElement => element.type === 'paragraph'
 
 export function toComposerEditorDescendants(
   body: KonpoComposedBody
@@ -131,14 +147,18 @@ export function toComposerEditorDescendants(
 
   return body.content
     .map((block) => {
-      if (block.type !== 'paragraph') {
+      if (!isKonpoParagraphElement(block)) {
         return null
       }
 
       const descendants = block.children
-        .map((inline) => {
+        .map((inline): ComposerText | ComposerLink | null => {
           if (isKonpoText(inline)) {
-            return inline
+            return { ...inline }
+          }
+
+          if (isKonpoLink(inline)) {
+            return { ...inline }
           }
 
           return null
@@ -155,13 +175,17 @@ export function toComposerEditorDescendants(
 
 const isComposerParagraphElement = (
   element: ComposerEditorDescendant
-): element is KonpoParagraphElement =>
+): element is ComposerParagraphElement =>
   'type' in element && element.type === 'paragraph'
 
 const isComposerText = (
   element: ComposerEditorDescendant
-): element is KonpoText =>
+): element is ComposerText =>
   !('type' in element) && 'text' in element && typeof element.text === 'string'
+
+const isComposerLink = (
+  element: ComposerEditorDescendant
+): element is ComposerLink => 'type' in element && element.type === 'link'
 
 export function toKonpoComposedBody(
   children: ComposerEditorDescendant[]
@@ -177,9 +201,13 @@ export function toKonpoComposedBody(
           return {
             type: 'paragraph',
             children: descendant.children
-              .map((inline) => {
+              .map((inline): KonpoText | KonpoLink | null => {
                 if (isComposerText(inline)) {
-                  return inline
+                  return { ...inline }
+                }
+
+                if (isComposerLink(inline)) {
+                  return { ...inline }
                 }
 
                 return null

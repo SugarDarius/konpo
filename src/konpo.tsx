@@ -112,6 +112,18 @@ const ComposerEditorElement = ({
           {children}
         </Primitive.p>
       )
+    case 'link':
+      return (
+        <Primitive.a
+          {...attributes}
+          konpo-link=''
+          href={element.url}
+          target='_blank'
+          rel='noopener noreferrer nofollow'
+        >
+          {children}
+        </Primitive.a>
+      )
     default:
       return null
   }
