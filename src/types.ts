@@ -70,16 +70,23 @@ export interface ComposerRootProps
     Children {
   /**
    * Whether the composer is disabled.
+   * @default false
    */
   disabled?: boolean
   /**
    * Composer initial content.
+   * @default undefined
    */
   initialValue?: KonpoComposedBody
   /**
    * Hotkeys for the composer.
    */
   shortcuts?: ComposerShortcuts
+  /**
+   * Wether to keep the focus on submit.
+   * @default true
+   */
+  keepFocusOnSubmit?: boolean
   /**
    * A callback that is called when the composer is submitted.
    */
@@ -89,10 +96,12 @@ export interface ComposerRootProps
 export interface ComposerEditorProps extends DivProps {
   /**
    * Placeholder text when the editor is empty.
+   * @default undefined
    */
   placeholder?: string
   /**
    * Autofocus editor when it mounts.
+   * @default false
    */
   autoFocus?: boolean
   /**
@@ -110,6 +119,7 @@ export interface ComposerMarkToggleTriggerProps extends ButtonProps, Children {
   mark: ComposerMark
   /**
    * Whether the mark is disabled
+   * @default false
    */
   disabled?: boolean
 }

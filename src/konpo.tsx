@@ -55,7 +55,15 @@ import { useInitial } from './_hooks/use-initial'
  */
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   (
-    { onSubmit, disabled = false, initialValue, shortcuts, children, ...props },
+    {
+      onSubmit,
+      disabled = false,
+      initialValue,
+      shortcuts,
+      keepFocusOnSubmit = true,
+      children,
+      ...props
+    },
     forwardedRef
   ) => {
     const stableOnSubmit = useStableCallback(
@@ -69,6 +77,7 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
         initialDisabled: disabled,
         initialValue,
         initialShortcuts: shortcuts,
+        keepFocusOnSubmit,
         handleSubmit: stableOnSubmit,
       })
     )

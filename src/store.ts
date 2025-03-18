@@ -43,6 +43,7 @@ export type KonpoStore = {
   isSelectionRangeActive: boolean
   activeSelectionRange: Range | null
   shortcuts: Required<ComposerShortcuts>
+  keepFocusOnSubmit: boolean
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -58,11 +59,13 @@ export function createKonpoStore({
   initialDisabled,
   initialValue,
   initialShortcuts,
+  keepFocusOnSubmit,
   handleSubmit,
 }: {
   initialDisabled: boolean
   initialValue?: KonpoComposedBody
   initialShortcuts?: ComposerShortcuts
+  keepFocusOnSubmit: boolean
   handleSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
@@ -85,6 +88,7 @@ export function createKonpoStore({
       strikethroughMark: initialShortcuts?.strikethroughMark ?? 'mod+shift+s',
       codeMark: initialShortcuts?.codeMark ?? 'mod+e',
     },
+    keepFocusOnSubmit,
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -231,7 +235,9 @@ export function createKonpoStore({
 
       const after = (): void => {
         state.clear()
-        state.blur()
+        if (!state.keepFocusOnSubmit) {
+          state.blur()
+        }
       }
 
       const body = toKonpoComposedBody(state.editor.children)
