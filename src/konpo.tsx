@@ -141,7 +141,7 @@ const ComposerEditorLeaf = ({
   }
 
   return (
-    <Primitive.span {...attributes} konpo-inline=''>
+    <Primitive.span {...attributes} konpo-inline-text=''>
       {content}
     </Primitive.span>
   )
