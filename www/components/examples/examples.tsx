@@ -12,13 +12,19 @@ export function Examples() {
         export function ComposableComposer() {
           return (
             <Composer.Root>
-              <Composer.Editor />
+              <Composer.Editor 
+                autoFocus
+                placeholder='Write a message'
+                Link={Composer.Link}
+              />
               <Composer.FloatingToolbar>
                 <Composer.ToggleMarkTrigger>
                   <BoldIcon />
                 </Composer.ToggleMarkTrigger>
               </Composer.FloatingToolbar>
-              <Composer.SubmitTrigger />
+              <Composer.SubmitTrigger>
+                Send
+              </Composer.SubmitTrigger>
             </Composer.Root>
           )
         }
