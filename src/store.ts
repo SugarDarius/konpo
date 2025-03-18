@@ -27,6 +27,8 @@ import {
   getComposerEditorActiveSelectionRange,
   discardComposerEditorActiveSelectionRange,
   clearComposerEditorMarks,
+  insertComposerEditorHardBreak,
+  insertComposerEditorSoftBreak,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 import { isHotKeys } from './_utils/keyboard'
@@ -76,9 +78,11 @@ export function createKonpoStore({
     activeSelectionRange: null,
     shortcuts: {
       submit: initialShortcuts?.submit ?? 'mod+Enter',
+      hardBreak: initialShortcuts?.hardBreak ?? 'Enter',
+      softBreak: initialShortcuts?.softBreak ?? 'shift+Enter',
       boldMark: initialShortcuts?.boldMark ?? 'mod+b',
       italicMark: initialShortcuts?.italicMark ?? 'mod+i',
-      strikethroughMark: initialShortcuts?.strikethroughMark ?? 'mod++shift+s',
+      strikethroughMark: initialShortcuts?.strikethroughMark ?? 'mod+shift+s',
       codeMark: initialShortcuts?.codeMark ?? 'mod+e',
     },
     select: (): void => {
@@ -173,6 +177,20 @@ export function createKonpoStore({
       if (isHotKeys(state.shortcuts.submit, e)) {
         e.preventDefault()
         state.onSubmit()
+
+        return
+      }
+
+      if (isHotKeys(state.shortcuts.hardBreak, e)) {
+        e.preventDefault()
+        insertComposerEditorHardBreak(state.editor)
+
+        return
+      }
+
+      if (isHotKeys(state.shortcuts.softBreak, e)) {
+        e.preventDefault()
+        insertComposerEditorSoftBreak(state.editor)
 
         return
       }

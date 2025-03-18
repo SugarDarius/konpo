@@ -40,6 +40,14 @@ export type ComposerShortcuts = {
    */
   submit?: Hotkeys
   /**
+   * Hotkeys to add a new paragraph.
+   */
+  hardBreak?: Hotkeys
+  /**
+   * Hotkeys to add a new line in the current paragraph.
+   */
+  softBreak?: Hotkeys
+  /**
    * Hotkeys to toggle bold mark.
    */
   boldMark?: Hotkeys

@@ -320,3 +320,9 @@ export function discardComposerEditorActiveSelectionRange(
     }
   )
 }
+export function insertComposerEditorHardBreak(editor: ComposerEditor): void {
+  editor.insertBreak()
+}
+export function insertComposerEditorSoftBreak(editor: ComposerEditor): void {
+  editor.insertSoftBreak()
+}
