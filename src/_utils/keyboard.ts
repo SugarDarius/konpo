@@ -58,10 +58,18 @@ export function isHotKeys(
   }
   const parsed = parseHotkeys(hotkeys)
 
-  if (parsed.alt !== event.altKey) return false
-  if (parsed.ctrl !== event.ctrlKey) return false
-  if (parsed.meta !== event.metaKey) return false
-  if (parsed.shift !== event.shiftKey) return false
+  if (parsed.alt !== event.altKey) {
+    return false
+  }
+  if (parsed.ctrl !== event.ctrlKey) {
+    return false
+  }
+  if (parsed.meta !== event.metaKey) {
+    return false
+  }
+  if (parsed.shift !== event.shiftKey) {
+    return false
+  }
 
   const eventKey = event.key.toLowerCase()
   const parsedKey = parsed.key.toLowerCase()

@@ -1,7 +1,7 @@
-export type { Hotkeys } from './_utils/keyboard'
 export type { ComposerMark } from './composer-editor'
 export type {
   Awaitable,
+  ComposerShortcuts,
   ComposerRootProps,
   ComposerEditorProps,
   ComposerSubmitTriggerProps,

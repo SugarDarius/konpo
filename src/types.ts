@@ -34,6 +34,17 @@ export type ButtonProps = ComponentProps<typeof Primitive.button>
 
 export type Direction = 'ltr' | 'rtl'
 
+export type ComposerShortcuts = {
+  /**
+   * Hotkeys to submit the composer.
+   */
+  submit?: Hotkeys
+  /**
+   * Hotkeys to toggle bold mark.
+   */
+  boldMark?: Hotkeys
+}
+
 export interface ComposerRootProps
   extends Omit<DivProps, 'onSubmit'>,
     Children {
@@ -42,21 +53,17 @@ export interface ComposerRootProps
    */
   disabled?: boolean
   /**
-   * A callback that is called when the composer is submitted.
-   */
-  onSubmit?: (body: KonpoComposedBody) => Awaitable<void>
-  /**
-   * Hotkey to submit the composer.
-   */
-  submitHotkeys?: Hotkeys
-  /**
-   * Hotkey to toggle bold mark.
-   */
-  boldMarkHotkeys?: Hotkeys
-  /**
    * Composer initial content.
    */
   initialValue?: KonpoComposedBody
+  /**
+   * Hotkeys for the composer.
+   */
+  shortcuts?: ComposerShortcuts
+  /**
+   * A callback that is called when the composer is submitted.
+   */
+  onSubmit?: (body: KonpoComposedBody) => Awaitable<void>
 }
 
 export interface ComposerEditorProps extends DivProps {

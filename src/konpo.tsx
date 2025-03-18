@@ -55,31 +55,21 @@ import { useInitial } from './_hooks/use-initial'
  */
 const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
   (
-    {
-      onSubmit,
-      disabled = false,
-      initialValue,
-      submitHotkeys,
-      boldMarkHotkeys,
-      children,
-      ...props
-    },
+    { onSubmit, disabled = false, initialValue, shortcuts, children, ...props },
     forwardedRef
   ) => {
-    const onSubmitStable = useStableCallback(
+    const stableOnSubmit = useStableCallback(
       onSubmit ??
         createDevelopmentWarning(
           'Please provide on <Composer.Root /> an `onSubmit` callback.'
         )
     )
-
     const store = useCreateStore(() =>
       createKonpoStore({
-        disabled,
+        initialDisabled: disabled,
         initialValue,
-        submitHotkeys,
-        boldMarkHotkeys,
-        onSubmit: onSubmitStable,
+        initialShortcuts: shortcuts,
+        handleSubmit: stableOnSubmit,
       })
     )
     return (

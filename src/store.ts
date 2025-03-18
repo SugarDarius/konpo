@@ -3,7 +3,11 @@ import {
   useCreateStoreContext,
   type Store,
 } from './_utils/create-store'
-import type { ComposerRootProps, KonpoComposedBody } from './types'
+import type {
+  ComposerShortcuts,
+  ComposerRootProps,
+  KonpoComposedBody,
+} from './types'
 import {
   blurComposerEditor,
   clearComposerEditor,
@@ -25,7 +29,7 @@ import {
   clearComposerEditorMarks,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
-import { type Hotkeys, isHotKeys } from './_utils/keyboard'
+import { isHotKeys } from './_utils/keyboard'
 
 export type KonpoStore = {
   editor: ComposerEditor
@@ -36,8 +40,7 @@ export type KonpoStore = {
   selectedMarks: ComposerMarks
   isSelectionRangeActive: boolean
   activeSelectionRange: Range | null
-  submitHotkeys: Hotkeys
-  boldMarkHotkeys: Hotkeys
+  shortcuts: Required<ComposerShortcuts>
   focus: (resetSelection?: boolean) => void
   select: () => void
   assert: () => void
@@ -50,21 +53,19 @@ export type KonpoStore = {
 }
 
 export function createKonpoStore({
-  disabled,
+  initialDisabled,
   initialValue,
-  submitHotkeys = 'mod+Enter',
-  boldMarkHotkeys = 'mod+b',
-  onSubmit,
+  initialShortcuts,
+  handleSubmit,
 }: {
-  disabled: boolean
+  initialDisabled: boolean
   initialValue?: KonpoComposedBody
-  submitHotkeys?: Hotkeys
-  boldMarkHotkeys?: Hotkeys
-  onSubmit: NonNullable<ComposerRootProps['onSubmit']>
+  initialShortcuts?: ComposerShortcuts
+  handleSubmit: NonNullable<ComposerRootProps['onSubmit']>
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
     editor: createComposerEditor(),
-    disabled,
+    disabled: initialDisabled,
     focused: false,
     canSubmit: false,
     initialValue: initialValue
@@ -73,8 +74,10 @@ export function createKonpoStore({
     selectedMarks: baseComposerMarks,
     isSelectionRangeActive: false,
     activeSelectionRange: null,
-    submitHotkeys,
-    boldMarkHotkeys,
+    shortcuts: {
+      submit: initialShortcuts?.submit ?? 'mod+Enter',
+      boldMark: initialShortcuts?.boldMark ?? 'mod+b',
+    },
     select: (): void => {
       const editor = get().editor
       selectComposerEditor(editor)
@@ -103,7 +106,7 @@ export function createKonpoStore({
         )
 
         set({
-          canSubmit: !isEmpty && !disabled,
+          canSubmit: !isEmpty && !state.disabled,
           selectedMarks,
           isSelectionRangeActive: activeSelectionRange !== null,
           activeSelectionRange,
@@ -164,14 +167,14 @@ export function createKonpoStore({
         return
       }
 
-      if (isHotKeys(state.submitHotkeys, e)) {
+      if (isHotKeys(state.shortcuts.submit, e)) {
         e.preventDefault()
         state.onSubmit()
 
         return
       }
 
-      if (isHotKeys(state.boldMarkHotkeys, e)) {
+      if (isHotKeys(state.shortcuts.boldMark, e)) {
         e.preventDefault()
         state.toggleMark('bold')
 
@@ -192,7 +195,7 @@ export function createKonpoStore({
       }
 
       const body = toKonpoComposedBody(state.editor.children)
-      const maybePromise = onSubmit(body)
+      const maybePromise = handleSubmit(body)
       if (isPromise(maybePromise)) {
         maybePromise.then(after)
       }
