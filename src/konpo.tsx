@@ -38,7 +38,10 @@ import {
   type ComposerEditorEditableRenderLeafProps,
   type ComposerEditorEditableRenderPlaceholderProps,
 } from './composer-editor'
+
 import { useInitial } from './_hooks/use-initial'
+import { useContentZIndex } from './_hooks/use-content-z-index'
+import { useComposedRefs } from './_hooks/use-composed-refs'
 
 /**
  * Adds the root of the composer.
@@ -458,6 +461,11 @@ const ComposerFloatingToolbar = forwardRef<
   const isFocused = useSelectorKey(store, 'focused')
   const activeSelectionRange = useSelectorKey(store, 'activeSelectionRange')
 
+  const [contentRef, contentZIndex] = useContentZIndex()
+  const mergedRefs = useComposedRefs(forwardedRef, (node) => {
+    contentRef(node)
+  })
+
   const isOpen = isSelectionRangeActive && isFocused
 
   const { refs, floatingStyles, context, placement } = useFloating({
@@ -504,12 +512,16 @@ const ComposerFloatingToolbar = forwardRef<
   return isOpen ? (
     <Portal
       ref={refs.setFloating}
-      style={{ ...floatingStyles, minWidth: 'max-content' }}
+      style={{
+        ...floatingStyles,
+        minWidth: 'max-content',
+        zIndex: contentZIndex,
+      }}
       {...getFloatingProps()}
     >
       <Comp
         {...props}
-        ref={forwardedRef}
+        ref={mergedRefs}
         data-side={side}
         data-align={align}
         konpo-floating-toolbar=''

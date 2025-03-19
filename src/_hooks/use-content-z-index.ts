@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
-import { useStableCallback } from './use-stable-callback'
+// import { useStableCallback } from './use-stable-callback'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 export function useContentZIndex() {
-  const [content, setContent] = useState<HTMLDivElement | undefined>(undefined)
-  const [zIndex, setZIndex] = useState<string | null>(null)
+  const [content, setContent] = useState<HTMLDivElement | null>(null)
+  const [zIndex, setZIndex] = useState<string>()
 
-  const contentRef = useStableCallback(setContent)
+  const contentRef = useCallback(setContent, [setContent])
 
   useIsomorphicLayoutEffect(() => {
     if (content) {
