@@ -103,6 +103,7 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
  * @example
  * ```tsx
  * <Composer.Link href='https://example.com'>Example</Composer.Link>
+ * ```
  */
 const ComposerLink = forwardRef<HTMLAnchorElement, ComposerLinkProps>(
   ({ asChild, ...props }, forwardedRef) => {
@@ -157,7 +158,9 @@ const ComposerEditorElement = ({
 
 /**
  * Renders a leaf of the editor follow this schema 👇🏻
+ * ```html
  * <code><s><em><strong>{element.text}</strong></s></em></code>
+ * ```
  */
 const ComposerEditorLeaf = ({
   leaf,
@@ -371,6 +374,7 @@ const ComposerSubmitTrigger = forwardRef<
  * @example
  * ```tsx
  * <Composer.ToggleMarkTrigger mark='bold'>Bold</Composer.ToggleMarkTrigger>
+ * ```
  */
 const ComposerToggleMarkTrigger = forwardRef<
   HTMLButtonElement,
@@ -442,6 +446,7 @@ const ComposerToggleMarkTrigger = forwardRef<
  *    <Composer.ToggleMarkTrigger mark='code'>Code</Composer.ToggleMarkTrigger>
  *  </Composer.FloatingToolbar>
  * </Composer.Root />
+ * ```
  */
 const ComposerFloatingToolbar = forwardRef<
   HTMLDivElement,
