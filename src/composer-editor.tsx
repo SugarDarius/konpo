@@ -425,7 +425,7 @@ const withMarkdownMarksShortcuts = (editor: ComposerEditor): ComposerEditor => {
     baseInsertText(text)
 
     // Only process if we're inserting a character that could complete a markdown pattern
-    if (['*', '~', '`'].includes(text)) {
+    if (['*', '_', '~', '`'].includes(text)) {
       const { selection } = editor
 
       // Only process if we have a valid cursor position
@@ -442,32 +442,31 @@ const withMarkdownMarksShortcuts = (editor: ComposerEditor): ComposerEditor => {
           const range = { anchor, focus: start }
           const beforeText = SlateEditor.string(editor, range)
 
-          // Check for bold: **text**
-          const boldMatch = beforeText.match(/\*\*(.*?)\*\*$/)
+          // Check for bold: *text*
+          const boldMatch = beforeText.match(/\*([^\s].*?[^\s])\*$/)
           if (boldMatch && boldMatch[1] && boldMatch[1].length > 0) {
             applyMarkdownFormatting(editor, boldMatch, 'bold')
             return
           }
 
-          // Check for strikethrough: ~~text~~
-          const strikeMatch = beforeText.match(/~~(.*?)~~$/)
+          // Check for italic: _text_
+          const italicMatch = beforeText.match(/_([^\s].*?[^\s])_$/)
+          if (italicMatch && italicMatch[1] && italicMatch[1].length > 0) {
+            applyMarkdownFormatting(editor, italicMatch, 'italic')
+            return
+          }
+
+          // Check for strikethrough: ~text~
+          const strikeMatch = beforeText.match(/~([^\s].*?[^\s])~$/)
           if (strikeMatch && strikeMatch[1] && strikeMatch[1].length > 0) {
             applyMarkdownFormatting(editor, strikeMatch, 'strikethrough')
             return
           }
 
           // Check for code: `text`
-          const codeMatch = beforeText.match(/`([^`]+)`$/)
+          const codeMatch = beforeText.match(/`([^\s].*?[^\s])`$/)
           if (codeMatch && codeMatch[1] && codeMatch[1].length > 0) {
             applyMarkdownFormatting(editor, codeMatch, 'code')
-            return
-          }
-
-          // Check for italic: *text* (but not part of **)
-          // This needs to be checked last to avoid conflicts with bold
-          const italicMatch = beforeText.match(/(?<!\*)\*([^*]+)\*(?!\*)$/)
-          if (italicMatch && italicMatch[1] && italicMatch[1].length > 0) {
-            applyMarkdownFormatting(editor, italicMatch, 'italic')
             return
           }
         }
