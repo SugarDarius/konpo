@@ -56,7 +56,9 @@ export type ComposerParagraphElement = {
 export type ComposerMark = keyof Omit<ComposerText, 'text'>
 export type ComposerMarks = Record<ComposerMark, boolean>
 
-export type ComposerEditor = BaseEditor & ReactEditor & HistoryEditor
+export interface ComposerEditor extends BaseEditor, ReactEditor, HistoryEditor {
+  pendingPrimeMarks?: { [key in ComposerMark]?: boolean }
+}
 export type ComposerEditorDescendant = Descendant
 
 declare module 'slate' {
@@ -94,6 +96,12 @@ export function toggleComposerEditorMark(
   mark: ComposerMark
 ): void {
   const isMarkActive = isComposerMarkActive(editor, mark)
+
+  if (isComposerEditorEmpty(editor, editor.children)) {
+    editor.pendingPrimeMarks = { [mark]: !isMarkActive }
+    return
+  }
+
   if (isMarkActive) {
     SlateEditor.removeMark(editor, mark)
   } else {
@@ -470,12 +478,34 @@ const withMarkdownMarksShortcuts = (editor: ComposerEditor): ComposerEditor => {
   return editor
 }
 
+const withPrimeMarks = (editor: ComposerEditor): ComposerEditor => {
+  const { insertText: baseInsertText } = editor
+
+  // Apply pending marks before inserting text
+  // Mostly used to apply marks before inserting any text in the editor
+  editor.insertText = (text) => {
+    const pendingPrimeMarks = editor.pendingPrimeMarks ?? {}
+    const hasPendingMarks = Object.keys(pendingPrimeMarks).length > 0
+
+    if (hasPendingMarks) {
+      for (const [mark, value] of Object.entries(pendingPrimeMarks)) {
+        SlateEditor.addMark(editor, mark, value)
+      }
+    }
+
+    baseInsertText(text)
+    editor.pendingPrimeMarks = {}
+  }
+
+  return editor
+}
+
 export function createComposerEditor(): ComposerEditor {
   return withNormalizer(
     withHistory(
       withAutoLink(
         withMarkdownMarksShortcuts(
-          withReact(createSlateEditor() as ComposerEditor)
+          withPrimeMarks(withReact(createSlateEditor() as ComposerEditor))
         )
       )
     )
