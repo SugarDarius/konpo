@@ -29,6 +29,7 @@ import {
   clearComposerEditorMarks,
   insertComposerEditorHardBreak,
   insertComposerEditorSoftBreak,
+  leaveComposerEditorMarkFromEdge,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 import { isHotKeys } from './_utils/keyboard'
@@ -223,6 +224,20 @@ export function createKonpoStore({
       if (isHotKeys(state.shortcuts.codeMark, e)) {
         e.preventDefault()
         state.toggleMark('code')
+
+        return
+      }
+
+      if (isHotKeys('ArrowLeft', e)) {
+        leaveComposerEditorMarkFromEdge(state.editor, 'start')
+
+        return
+      }
+
+      if (isHotKeys('ArrowRight', e)) {
+        leaveComposerEditorMarkFromEdge(state.editor, 'end')
+
+        return
       }
     },
     onSubmit: (): void => {

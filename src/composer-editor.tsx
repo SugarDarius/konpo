@@ -2,6 +2,7 @@ import {
   type BaseEditor,
   type Element,
   type Descendant,
+  type Location,
   createEditor as createSlateEditor,
   Editor as SlateEditor,
   Transforms as SlateTransforms,
@@ -121,6 +122,52 @@ export function clearComposerEditorMarks(editor: ComposerEditor): void {
     }
   )
 }
+const getCharacterBefore = (editor: ComposerEditor, at: Location) => {
+  const before = SlateEditor.before(editor, at, { unit: 'character' })
+  if (!before) {
+    return
+  }
+
+  const to = SlateRange.isRange(at) ? SlateRange.start(at) : at
+  const range = SlateEditor.range(editor, before, to)
+  const text = SlateEditor.string(editor, range)
+
+  return { range, text }
+}
+const getCharacterAfter = (
+  editor: ComposerEditor,
+  at: Location
+): { range: SlateRange; text: string } | undefined => {
+  const after = SlateEditor.after(editor, at, { unit: 'character' })
+  if (!after) {
+    return
+  }
+
+  const to = SlateRange.isRange(at) ? SlateRange.end(at) : at
+  const range = SlateEditor.range(editor, to, after)
+  const text = SlateEditor.string(editor, range)
+
+  return { range, text }
+}
+export function leaveComposerEditorMarkFromEdge(
+  editor: ComposerEditor,
+  edge: 'start' | 'end'
+): void {
+  const selection = editor.selection
+  if (selection && SlateRange.isCollapsed(selection)) {
+    const marks = Object.keys(SlateEditor.marks(editor) ?? {})
+    if (marks.length > 0) {
+      const character =
+        edge === 'start'
+          ? getCharacterBefore(editor, selection)
+          : getCharacterAfter(editor, selection)
+      if (character) {
+        clearComposerEditorMarks(editor)
+      }
+    }
+  }
+}
+
 export const baseComposerMarks: ComposerMarks = {
   bold: false,
   italic: false,
