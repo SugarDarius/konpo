@@ -30,3 +30,7 @@ export function isUrl(input: string): boolean {
 
   return false
 }
+
+export function escapeRegExp(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}

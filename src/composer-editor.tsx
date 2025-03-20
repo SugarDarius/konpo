@@ -74,6 +74,163 @@ declare module 'slate-react' {
   > & { element: E }
 }
 
+export function getSelectedComposerEditorMarks(
+  editor: ComposerEditor
+): ComposerMarks {
+  const marks = SlateEditor.marks(editor)
+  return { ...baseComposerMarks, ...marks }
+}
+export function isComposerMarkActive(
+  editor: ComposerEditor,
+  mark: ComposerMark
+): boolean {
+  const marks = getSelectedComposerEditorMarks(editor)
+  const isActive = marks[mark]
+
+  return isActive
+}
+export function toggleComposerEditorMark(
+  editor: ComposerEditor,
+  mark: ComposerMark
+): void {
+  const isMarkActive = isComposerMarkActive(editor, mark)
+  if (isMarkActive) {
+    SlateEditor.removeMark(editor, mark)
+  } else {
+    SlateEditor.addMark(editor, mark, true)
+  }
+}
+export function clearComposerEditorMarks(editor: ComposerEditor): void {
+  ignoreOnThrow(
+    "Failed to clear composer's editor marks, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      const marks = SlateEditor.marks(editor)
+      if (marks) {
+        for (const mark in marks) {
+          SlateEditor.removeMark(editor, mark)
+        }
+      }
+    }
+  )
+}
+export const baseComposerMarks: ComposerMarks = {
+  bold: false,
+  italic: false,
+  strikethrough: false,
+  code: false,
+}
+
+// NOTE: This function is used to check if the editor is empty.
+// It may be useful to rethink this algorithm to make it more efficient.
+export function isComposerEditorEmpty(
+  editor: ComposerEditor,
+  descendants: ComposerEditorDescendant[]
+): boolean {
+  if (descendants.length <= 0) {
+    return true
+  }
+
+  for (const descendant of descendants) {
+    if (isComposerText(descendant)) {
+      if (!isEmptyString(descendant.text)) {
+        return false
+      }
+    } else if (isComposerParagraphElement(descendant)) {
+      if (!isComposerEditorEmpty(editor, descendant.children)) {
+        return false
+      }
+    } else {
+      if (!SlateEditor.isEmpty(editor, descendant)) {
+        return false
+      }
+    }
+  }
+
+  return true
+}
+
+export function clearComposerEditor(editor: ComposerEditor): void {
+  ignoreOnThrow(
+    "Failed to clear composer's editor, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      SlateTransforms.delete(editor, {
+        at: {
+          anchor: SlateEditor.start(editor, []),
+          focus: SlateEditor.end(editor, []),
+        },
+      })
+    }
+  )
+}
+export function blurComposerEditor(editor: ComposerEditor): void {
+  ignoreOnThrow(
+    "Failed to blur composer's editor, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      SlateReactEditor.blur(editor)
+    }
+  )
+}
+export function focusComposerEditor(
+  editor: ComposerEditor,
+  resetSelection = true
+): void {
+  ignoreOnThrow(
+    "Failed to focus composer's editor, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      if (!SlateReactEditor.isFocused(editor)) {
+        SlateTransforms.select(
+          editor,
+          resetSelection || !editor.selection
+            ? SlateEditor.end(editor, [])
+            : editor.selection
+        )
+        SlateReactEditor.focus(editor)
+      }
+    }
+  )
+}
+export function selectComposerEditor(editor: ComposerEditor): void {
+  ignoreOnThrow(
+    "Failed to select composer's editor, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      SlateTransforms.select(editor, SlateEditor.end(editor, []))
+    }
+  )
+}
+export function getComposerEditorActiveSelectionRange(
+  editor: ComposerEditor,
+  domSelection: Selection | null
+): Range | null {
+  const selection = editor.selection
+  if (
+    !selection ||
+    SlateRange.isCollapsed(selection) ||
+    !domSelection ||
+    !domSelection.rangeCount
+  ) {
+    return null
+  }
+
+  return domSelection.getRangeAt(0)
+}
+export function discardComposerEditorActiveSelectionRange(
+  editor: ComposerEditor
+): void {
+  ignoreOnThrow(
+    "Failed to discard active selection range, '<Composer.Root />' may be unmounted.",
+    (): void => {
+      SlateTransforms.deselect(editor)
+      selectComposerEditor(editor)
+    }
+  )
+}
+export function insertComposerEditorHardBreak(editor: ComposerEditor): void {
+  editor.insertBreak()
+}
+export function insertComposerEditorSoftBreak(editor: ComposerEditor): void {
+  editor.insertSoftBreak()
+}
+
 const withNormalizer = (editor: ComposerEditor): ComposerEditor => {
   const { normalizeNode: baseNormalizeNode } = editor
 
@@ -206,9 +363,122 @@ const withAutoLink = (editor: ComposerEditor): ComposerEditor => {
   return editor
 }
 
+const applyMarkdownFormatting = (
+  editor: SlateEditor,
+  match: RegExpMatchArray,
+  format: ComposerMark
+) => {
+  const { selection } = editor
+  if (!selection) return
+
+  const [fullMatch, content] = match
+  if (!content) {
+    return
+  }
+  const { anchor } = selection
+
+  // Calculate the positions
+  const startOfMatch = anchor.offset - fullMatch.length
+  const endOfMatch = anchor.offset
+
+  // Delete the matched text (including markdown syntax)
+  SlateTransforms.delete(editor, {
+    at: {
+      anchor: { ...anchor, offset: startOfMatch },
+      focus: { ...anchor, offset: endOfMatch },
+    },
+  })
+
+  // Insert the content without markdown syntax
+  SlateTransforms.insertText(editor, content, {
+    at: { ...anchor, offset: startOfMatch },
+  })
+
+  // Apply the mark to the inserted content
+  SlateTransforms.select(editor, {
+    anchor: { ...anchor, offset: startOfMatch },
+    focus: { ...anchor, offset: startOfMatch + content.length },
+  })
+
+  // Apply the mark
+  SlateEditor.addMark(editor, format, true)
+
+  // Move cursor to the end of the formatted text
+  SlateTransforms.collapse(editor, { edge: 'end' })
+
+  // Remove the mark after applying it.
+  SlateEditor.removeMark(editor, format)
+}
+
+const withMarkdownMarksShortcuts = (editor: ComposerEditor): ComposerEditor => {
+  const { insertText: baseInsertText } = editor
+
+  editor.insertText = (text) => {
+    baseInsertText(text)
+
+    // Only process if we're inserting a character that could complete a markdown pattern
+    if (['*', '~', '`'].includes(text)) {
+      const { selection } = editor
+
+      // Only process if we have a valid cursor position
+      if (selection && SlateRange.isCollapsed(selection)) {
+        const { anchor } = selection
+        const block = SlateEditor.above(editor, {
+          match: (n) =>
+            SlateElement.isElement(n) && SlateEditor.isBlock(editor, n),
+        })
+
+        if (block) {
+          const [, blockPath] = block
+          const start = SlateEditor.start(editor, blockPath)
+          const range = { anchor, focus: start }
+          const beforeText = SlateEditor.string(editor, range)
+
+          // Check for bold: **text**
+          const boldMatch = beforeText.match(/\*\*(.*?)\*\*$/)
+          if (boldMatch && boldMatch[1] && boldMatch[1].length > 0) {
+            applyMarkdownFormatting(editor, boldMatch, 'bold')
+            return
+          }
+
+          // Check for strikethrough: ~~text~~
+          const strikeMatch = beforeText.match(/~~(.*?)~~$/)
+          if (strikeMatch && strikeMatch[1] && strikeMatch[1].length > 0) {
+            applyMarkdownFormatting(editor, strikeMatch, 'strikethrough')
+            return
+          }
+
+          // Check for code: `text`
+          const codeMatch = beforeText.match(/`([^`]+)`$/)
+          if (codeMatch && codeMatch[1] && codeMatch[1].length > 0) {
+            applyMarkdownFormatting(editor, codeMatch, 'code')
+            return
+          }
+
+          // Check for italic: *text* (but not part of **)
+          // This needs to be checked last to avoid conflicts with bold
+          const italicMatch = beforeText.match(/(?<!\*)\*([^*]+)\*(?!\*)$/)
+          if (italicMatch && italicMatch[1] && italicMatch[1].length > 0) {
+            applyMarkdownFormatting(editor, italicMatch, 'italic')
+            return
+          }
+        }
+      }
+    }
+  }
+
+  return editor
+}
+
 export function createComposerEditor(): ComposerEditor {
   return withNormalizer(
-    withHistory(withAutoLink(withReact(createSlateEditor() as ComposerEditor)))
+    withHistory(
+      withAutoLink(
+        withMarkdownMarksShortcuts(
+          withReact(createSlateEditor() as ComposerEditor)
+        )
+      )
+    )
   )
 }
 
@@ -342,165 +612,4 @@ export function toKonpoComposedBody(
       // TODO: temp type assertion until I add more block elements
       .filter(exists) as KonpoBlockElement[],
   }
-}
-
-export const baseComposerMarks: ComposerMarks = {
-  bold: false,
-  italic: false,
-  strikethrough: false,
-  code: false,
-}
-
-// NOTE: This function is used to check if the editor is empty.
-// It may be useful to rethink this algorithm to make it more efficient.
-export function isComposerEditorEmpty(
-  editor: ComposerEditor,
-  descendants: ComposerEditorDescendant[]
-): boolean {
-  if (descendants.length <= 0) {
-    return true
-  }
-
-  for (const descendant of descendants) {
-    if (isComposerText(descendant)) {
-      if (!isEmptyString(descendant.text)) {
-        return false
-      }
-    } else if (isComposerParagraphElement(descendant)) {
-      if (!isComposerEditorEmpty(editor, descendant.children)) {
-        return false
-      }
-    } else {
-      if (!SlateEditor.isEmpty(editor, descendant)) {
-        return false
-      }
-    }
-  }
-
-  return true
-}
-
-// Slate's DOM-specific operations can throw errors
-// in case the editor's DOM node can no longer exists if the composer
-// is unmounted before the operation is completed.
-// We can ignore these errors and log them in development 👇🏻
-export function clearComposerEditor(editor: ComposerEditor): void {
-  ignoreOnThrow(
-    "Failed to clear composer's editor, '<Composer.Root />' may be unmounted.",
-    (): void => {
-      SlateTransforms.delete(editor, {
-        at: {
-          anchor: SlateEditor.start(editor, []),
-          focus: SlateEditor.end(editor, []),
-        },
-      })
-    }
-  )
-}
-export function blurComposerEditor(editor: ComposerEditor): void {
-  ignoreOnThrow(
-    "Failed to blur composer's editor, '<Composer.Root />' may be unmounted.",
-    (): void => {
-      SlateReactEditor.blur(editor)
-    }
-  )
-}
-export function focusComposerEditor(
-  editor: ComposerEditor,
-  resetSelection = true
-): void {
-  ignoreOnThrow(
-    "Failed to focus composer's editor, '<Composer.Root />' may be unmounted.",
-    (): void => {
-      if (!SlateReactEditor.isFocused(editor)) {
-        SlateTransforms.select(
-          editor,
-          resetSelection || !editor.selection
-            ? SlateEditor.end(editor, [])
-            : editor.selection
-        )
-        SlateReactEditor.focus(editor)
-      }
-    }
-  )
-}
-export function selectComposerEditor(editor: ComposerEditor): void {
-  ignoreOnThrow(
-    "Failed to select composer's editor, '<Composer.Root />' may be unmounted.",
-    (): void => {
-      SlateTransforms.select(editor, SlateEditor.end(editor, []))
-    }
-  )
-}
-export function getSelectedComposerEditorMarks(
-  editor: ComposerEditor
-): ComposerMarks {
-  const marks = SlateEditor.marks(editor)
-  return { ...baseComposerMarks, ...marks }
-}
-export function isComposerMarkActive(
-  editor: ComposerEditor,
-  mark: ComposerMark
-): boolean {
-  const marks = getSelectedComposerEditorMarks(editor)
-  const isActive = marks[mark]
-
-  return isActive
-}
-export function toggleComposerEditorMark(
-  editor: ComposerEditor,
-  mark: ComposerMark
-): void {
-  const isMarkActive = isComposerMarkActive(editor, mark)
-  if (isMarkActive) {
-    SlateEditor.removeMark(editor, mark)
-  } else {
-    SlateEditor.addMark(editor, mark, true)
-  }
-}
-export function clearComposerEditorMarks(editor: ComposerEditor): void {
-  ignoreOnThrow(
-    "Failed to clear composer's editor marks, '<Composer.Root />' may be unmounted.",
-    (): void => {
-      const marks = SlateEditor.marks(editor)
-      if (marks) {
-        for (const mark in marks) {
-          SlateEditor.removeMark(editor, mark)
-        }
-      }
-    }
-  )
-}
-export function getComposerEditorActiveSelectionRange(
-  editor: ComposerEditor,
-  domSelection: Selection | null
-): Range | null {
-  const selection = editor.selection
-  if (
-    !selection ||
-    SlateRange.isCollapsed(selection) ||
-    !domSelection ||
-    !domSelection.rangeCount
-  ) {
-    return null
-  }
-
-  return domSelection.getRangeAt(0)
-}
-export function discardComposerEditorActiveSelectionRange(
-  editor: ComposerEditor
-): void {
-  ignoreOnThrow(
-    "Failed to discard active selection range, '<Composer.Root />' may be unmounted.",
-    (): void => {
-      SlateTransforms.deselect(editor)
-      selectComposerEditor(editor)
-    }
-  )
-}
-export function insertComposerEditorHardBreak(editor: ComposerEditor): void {
-  editor.insertBreak()
-}
-export function insertComposerEditorSoftBreak(editor: ComposerEditor): void {
-  editor.insertSoftBreak()
 }
