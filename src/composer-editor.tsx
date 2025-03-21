@@ -149,7 +149,7 @@ const getCharacterAfter = (
 
   return { range, text }
 }
-export function leaveComposerEditorMarkFromEdge(
+export function leaveComposerEditorMarkFromEdgeCharacter(
   editor: ComposerEditor,
   edge: 'start' | 'end'
 ): void {
@@ -161,7 +161,8 @@ export function leaveComposerEditorMarkFromEdge(
         edge === 'start'
           ? getCharacterBefore(editor, selection)
           : getCharacterAfter(editor, selection)
-      if (character) {
+
+      if (!character) {
         clearComposerEditorMarks(editor)
       }
     }

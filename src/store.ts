@@ -29,7 +29,7 @@ import {
   clearComposerEditorMarks,
   insertComposerEditorHardBreak,
   insertComposerEditorSoftBreak,
-  leaveComposerEditorMarkFromEdge,
+  leaveComposerEditorMarkFromEdgeCharacter,
 } from './composer-editor'
 import { isPromise } from './_utils/promise'
 import { isHotKeys } from './_utils/keyboard'
@@ -229,13 +229,13 @@ export function createKonpoStore({
       }
 
       if (isHotKeys('ArrowLeft', e)) {
-        leaveComposerEditorMarkFromEdge(state.editor, 'start')
+        leaveComposerEditorMarkFromEdgeCharacter(state.editor, 'start')
 
         return
       }
 
       if (isHotKeys('ArrowRight', e)) {
-        leaveComposerEditorMarkFromEdge(state.editor, 'end')
+        leaveComposerEditorMarkFromEdgeCharacter(state.editor, 'end')
 
         return
       }
