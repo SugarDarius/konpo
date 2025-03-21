@@ -107,6 +107,16 @@ export interface ComposerRootProps
    */
   keepFocusOnSubmit?: boolean
   /**
+   * Wether to use bullet list.
+   * @default true
+   */
+  withBulletList?: boolean
+  /**
+   * Wether to use markdown marks shortcuts.
+   *
+   */
+  withMarkdownMarksShortcuts?: boolean
+  /**
    * A callback that is called when the composer is submitted.
    */
   onSubmit?: (body: KonpoComposedBody) => Awaitable<void>

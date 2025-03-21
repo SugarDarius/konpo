@@ -35,11 +35,11 @@ import type {
   ComposerEditorEditableRenderElementProps,
   ComposerEditorEditableRenderLeafProps,
   ComposerEditorEditableRenderPlaceholderProps,
-} from './composer-editor'
+} from './_composer-editor/components'
 import {
   ComposerEditorEditable,
   ComposerEditorComponent,
-} from './composer-editor'
+} from './_composer-editor/components'
 
 import { useInitial } from './_hooks/use-initial'
 import { useContentZIndex } from './_hooks/use-content-z-index'
@@ -67,6 +67,8 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
       initialValue,
       shortcuts,
       keepFocusOnSubmit = true,
+      withBulletList = true,
+      withMarkdownMarksShortcuts = true,
       children,
       ...props
     },
@@ -85,6 +87,8 @@ const ComposerRoot = forwardRef<HTMLDivElement, ComposerRootProps>(
         initialShortcuts: shortcuts,
         keepFocusOnSubmit,
         handleSubmit: stableOnSubmit,
+        useBulletList: withBulletList,
+        useMarkdownMarksShortcuts: withMarkdownMarksShortcuts,
       })
     )
     return (

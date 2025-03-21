@@ -10,28 +10,32 @@ import type {
 import type {
   ComposerEditor,
   ComposerEditorDescendant,
-} from './composer-editor'
-import {
-  blurComposerEditor,
-  clearComposerEditor,
-  createComposerEditor,
-  focusComposerEditor,
-  isComposerEditorEmpty,
-  selectComposerEditor,
-  toKonpoComposedBody,
-  toComposerEditorDescendants,
-  baseComposerMarks,
-  getSelectedComposerEditorMarks,
-  toggleComposerEditorMark,
-  getComposerEditorActiveSelectionRange,
-  discardComposerEditorActiveSelectionRange,
-  clearComposerEditorMarks,
-  insertComposerEditorHardBreak,
-  insertComposerEditorSoftBreak,
-  leaveComposerEditorMarkFromEdgeCharacter,
-} from './composer-editor'
+} from './_composer-editor/composer'
 import { isPromise } from './_utils/promise'
 import { isHotKeys } from './_utils/keyboard'
+import {
+  selectComposerEditor,
+  focusComposerEditor,
+  isComposerEditorEmpty,
+  getComposerEditorActiveSelectionRange,
+  clearComposerEditor,
+  blurComposerEditor,
+  discardComposerEditorActiveSelectionRange,
+  insertComposerEditorHardBreak,
+  insertComposerEditorSoftBreak,
+} from './_composer-editor/common'
+import {
+  baseComposerMarks,
+  clearComposerEditorMarks,
+  getSelectedComposerEditorMarks,
+  toggleComposerEditorMark,
+  leaveComposerEditorMarkFromEdgeCharacter,
+} from './_composer-editor/marks'
+import {
+  toComposerEditorDescendants,
+  toKonpoComposedBody,
+} from './_composer-editor/transformers'
+import { createComposerEditor } from './_composer-editor/factory'
 
 export type KonpoStore = {
   editor: ComposerEditor
@@ -61,15 +65,19 @@ export function createKonpoStore({
   initialShortcuts,
   keepFocusOnSubmit,
   handleSubmit,
+  useBulletList,
+  useMarkdownMarksShortcuts,
 }: {
   initialDisabled: boolean
   initialValue?: KonpoComposedBody
   initialShortcuts?: ComposerShortcuts
   keepFocusOnSubmit: boolean
   handleSubmit: NonNullable<ComposerRootProps['onSubmit']>
+  useBulletList: boolean
+  useMarkdownMarksShortcuts: boolean
 }): Store<KonpoStore> {
   return createStore<KonpoStore>((set, get) => ({
-    editor: createComposerEditor(),
+    editor: createComposerEditor({ useBulletList, useMarkdownMarksShortcuts }),
     disabled: initialDisabled,
     focused: false,
     canSubmit: false,
