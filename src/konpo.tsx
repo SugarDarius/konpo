@@ -156,6 +156,26 @@ const ComposerEditorElement = ({
           <Link href={element.url}>{children}</Link>
         </Primitive.span>
       )
+    case 'bullet-list':
+      return (
+        <Primitive.ul
+          {...attributes}
+          konpo-bullet-list=''
+          style={{ position: 'relative' }}
+        >
+          {children}
+        </Primitive.ul>
+      )
+    case 'list-item':
+      return (
+        <Primitive.li
+          {...attributes}
+          konpo-list-item=''
+          style={{ position: 'relative' }}
+        >
+          {children}
+        </Primitive.li>
+      )
     default:
       return null
   }
