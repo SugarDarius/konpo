@@ -43,15 +43,7 @@ export type ComposerLinkElement = {
   children: ComposerText[]
 }
 
-export type ComposerBulletListElement = {
-  type: 'bullet-list'
-  children: ComposerInlineElement[]
-}
-
-export type ComposerInlineElement =
-  | ComposerBulletListElement
-  | ComposerLinkElement
-  | ComposerText
+export type ComposerInlineElement = ComposerLinkElement | ComposerText
 
 export type ComposerParagraphElement = {
   type: 'paragraph'
@@ -66,10 +58,7 @@ export type ComposerEditorDescendant = Descendant
 declare module 'slate' {
   interface CustomTypes {
     Editor: ComposerEditor
-    Element:
-      | ComposerParagraphElement
-      | ComposerBulletListElement
-      | ComposerLinkElement
+    Element: ComposerParagraphElement | ComposerLinkElement
     Text: ComposerText
   }
 }
