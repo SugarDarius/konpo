@@ -2,8 +2,20 @@ import { Primitive } from '@radix-ui/react-primitive'
 import type { ComponentProps, ReactNode } from 'react'
 
 import type { Hotkeys } from './_utils/keyboard'
-import type { ComposerMark } from './composer-editor'
 
+/** Composer specific types - some are public */
+export type ComposerText = {
+  bold?: boolean
+  italic?: boolean
+  strikethrough?: boolean
+  code?: boolean
+  text: string
+}
+
+export type ComposerMark = keyof Omit<ComposerText, 'text'> // part of public API
+export type ComposerMarks = Record<ComposerMark, boolean>
+
+/** Public API types  */
 export type Awaitable<T> = T | Promise<T>
 
 export type KonpoText = {
@@ -14,13 +26,13 @@ export type KonpoText = {
   text: string
 }
 
-export type KonpoLink = {
+export type KonpoLinkElement = {
   type: 'link'
   url: string
   text: string
 }
 
-export type KonpoInlineElement = KonpoLink | KonpoText
+export type KonpoInlineElement = KonpoLinkElement | KonpoText
 
 export type KonpoParagraphElement = {
   type: 'paragraph'

@@ -1,8 +1,5 @@
+import type { BaseEditor, Element, Descendant, Location } from 'slate'
 import {
-  type BaseEditor,
-  type Element,
-  type Descendant,
-  type Location,
   createEditor as createSlateEditor,
   Editor as SlateEditor,
   Transforms as SlateTransforms,
@@ -10,13 +7,16 @@ import {
   Element as SlateElement,
   Node as SlateNode,
 } from 'slate'
-import { withHistory, type HistoryEditor } from 'slate-history'
+import type { HistoryEditor } from 'slate-history'
+import { withHistory } from 'slate-history'
+import type {
+  ReactEditor,
+  RenderElementProps,
+  RenderLeafProps,
+  RenderPlaceholderProps,
+} from 'slate-react'
 import {
   withReact,
-  type ReactEditor,
-  type RenderElementProps,
-  type RenderLeafProps,
-  type RenderPlaceholderProps,
   Slate as SlateComponent,
   Editable as SlateEditableComponent,
   ReactEditor as SlateReactEditor,
@@ -25,37 +25,38 @@ import {
 import { exists } from './_utils/identity'
 import { isEmptyString, isUrl } from './_utils/string'
 import type {
+  ComposerText,
   KonpoParagraphElement,
   KonpoInlineElement,
-  KonpoLink,
+  KonpoLinkElement,
   KonpoText,
   KonpoComposedBody,
   KonpoBlockElement,
+  ComposerMark,
+  ComposerMarks,
 } from './types'
 import { ignoreOnThrow } from './_utils/error'
 
-export type ComposerText = {
-  bold?: boolean
-  italic?: boolean
-  strikethrough?: boolean
-  code?: boolean
-  text: string
-}
-
-export type ComposerLink = {
+export type ComposerLinkElement = {
   type: 'link'
   url: string
   children: ComposerText[]
 }
 
-export type ComposerInlineElement = ComposerLink | ComposerText
+export type ComposerBulletListElement = {
+  type: 'bullet-list'
+  children: ComposerInlineElement[]
+}
+
+export type ComposerInlineElement =
+  | ComposerBulletListElement
+  | ComposerLinkElement
+  | ComposerText
+
 export type ComposerParagraphElement = {
   type: 'paragraph'
   children: ComposerInlineElement[]
 }
-
-export type ComposerMark = keyof Omit<ComposerText, 'text'>
-export type ComposerMarks = Record<ComposerMark, boolean>
 
 export interface ComposerEditor extends BaseEditor, ReactEditor, HistoryEditor {
   pendingPrimeMarks?: { [key in ComposerMark]?: boolean }
@@ -65,7 +66,10 @@ export type ComposerEditorDescendant = Descendant
 declare module 'slate' {
   interface CustomTypes {
     Editor: ComposerEditor
-    Element: ComposerParagraphElement | ComposerLink
+    Element:
+      | ComposerParagraphElement
+      | ComposerBulletListElement
+      | ComposerLinkElement
     Text: ComposerText
   }
 }
@@ -347,7 +351,7 @@ const wrapComposerLink = (
 
   const selection = editor.selection
   const isCollapsed = selection && SlateRange.isCollapsed(selection)
-  const link: ComposerLink = {
+  const link: ComposerLinkElement = {
     type: 'link',
     url,
     children: isCollapsed ? [{ text: text ?? url }] : [],
@@ -591,7 +595,7 @@ const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
   inline.text !== undefined &&
   typeof inline.text === 'string'
 
-const isKonpoLink = (inline: KonpoInlineElement): inline is KonpoLink =>
+const isKonpoLink = (inline: KonpoInlineElement): inline is KonpoLinkElement =>
   'type' in inline && inline.type === 'link'
 
 const isKonpoParagraphElement = (
@@ -612,7 +616,7 @@ export function toComposerEditorDescendants(
       }
 
       const descendants = block.children
-        .map((inline): ComposerText | ComposerLink | null => {
+        .map((inline): ComposerText | ComposerLinkElement | null => {
           if (isKonpoText(inline)) {
             return { ...inline }
           }
@@ -649,7 +653,8 @@ const isComposerText = (
 
 const isComposerLink = (
   element: ComposerEditorDescendant
-): element is ComposerLink => 'type' in element && element.type === 'link'
+): element is ComposerLinkElement =>
+  'type' in element && element.type === 'link'
 
 export function toKonpoComposedBody(
   children: ComposerEditorDescendant[]
@@ -665,7 +670,7 @@ export function toKonpoComposedBody(
           return {
             type: 'paragraph',
             children: descendant.children
-              .map((inline): KonpoText | KonpoLink | null => {
+              .map((inline): KonpoText | KonpoLinkElement | null => {
                 if (isComposerText(inline)) {
                   return { ...inline }
                 }

@@ -1,13 +1,16 @@
-import {
-  createStore,
-  useCreateStoreContext,
-  type Store,
-} from './_utils/create-store'
+import type { Store } from './_utils/create-store'
+import { createStore, useCreateStoreContext } from './_utils/create-store'
 import type {
+  ComposerMarks,
+  ComposerMark,
   ComposerShortcuts,
   ComposerRootProps,
   KonpoComposedBody,
 } from './types'
+import type {
+  ComposerEditor,
+  ComposerEditorDescendant,
+} from './composer-editor'
 import {
   blurComposerEditor,
   clearComposerEditor,
@@ -18,11 +21,7 @@ import {
   toKonpoComposedBody,
   toComposerEditorDescendants,
   baseComposerMarks,
-  type ComposerEditor,
-  type ComposerEditorDescendant,
-  type ComposerMarks,
   getSelectedComposerEditorMarks,
-  type ComposerMark,
   toggleComposerEditorMark,
   getComposerEditorActiveSelectionRange,
   discardComposerEditorActiveSelectionRange,

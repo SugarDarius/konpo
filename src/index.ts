@@ -1,6 +1,6 @@
-export type { ComposerMark } from './composer-editor'
 export type {
   Awaitable,
+  ComposerMark,
   ComposerShortcuts,
   ComposerRootProps,
   ComposerLinkProps,
@@ -9,6 +9,7 @@ export type {
   ComposerMarkToggleTriggerProps,
   ComposerFloatingToolbarProps,
   KonpoText,
+  KonpoLinkElement,
   KonpoInlineElement,
   KonpoParagraphElement,
   KonpoBlockElement,

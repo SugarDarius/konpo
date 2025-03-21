@@ -31,12 +31,14 @@ import type {
 import { createDevelopmentWarning } from './_utils/warning'
 import { useCreateStore, useSelectorKey } from './_utils/create-store'
 import { createKonpoStore, KonpoStoreProvider, useKonpoStore } from './store'
+import type {
+  ComposerEditorEditableRenderElementProps,
+  ComposerEditorEditableRenderLeafProps,
+  ComposerEditorEditableRenderPlaceholderProps,
+} from './composer-editor'
 import {
   ComposerEditorEditable,
   ComposerEditorComponent,
-  type ComposerEditorEditableRenderElementProps,
-  type ComposerEditorEditableRenderLeafProps,
-  type ComposerEditorEditableRenderPlaceholderProps,
 } from './composer-editor'
 
 import { useInitial } from './_hooks/use-initial'
