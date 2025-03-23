@@ -1,6 +1,7 @@
 import type {
   ComposerText,
   KonpoBlockElement,
+  KonpoBulletListElement,
   KonpoInlineElement,
   KonpoLinkElement,
   KonpoParagraphElement,
@@ -9,6 +10,7 @@ import type {
 import type {
   ComposerEditorDescendant,
   ComposerLinkElement,
+  ComposerListItemElement,
   ComposerParagraphElement,
 } from './composer'
 
@@ -26,7 +28,16 @@ export const isComposerParagraph = (
   element: ComposerEditorDescendant
 ): element is ComposerParagraphElement =>
   'type' in element && element.type === 'paragraph'
-// TODO: add guards for bullet list
+
+export const isComposerListItem = (
+  element: ComposerEditorDescendant
+): element is ComposerListItemElement =>
+  'type' in element && element.type === 'list-item'
+
+export const isComposerBulletList = (
+  element: ComposerEditorDescendant
+): element is ComposerListItemElement =>
+  'type' in element && element.type === 'bullet-list'
 
 export const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
   !('type' in inline) &&
@@ -41,4 +52,6 @@ export const isKonpoParagraph = (
   element: KonpoBlockElement
 ): element is KonpoParagraphElement => element.type === 'paragraph'
 
-// TODO: add guards for bullet
+export const isKonpoBulletList = (
+  element: KonpoBlockElement
+): element is KonpoBulletListElement => element.type === 'bullet-list'

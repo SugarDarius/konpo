@@ -39,7 +39,17 @@ export type KonpoParagraphElement = {
   children: KonpoInlineElement[]
 }
 
-export type KonpoBlockElement = KonpoParagraphElement
+export type KonpoListItemElement = {
+  type: 'list-item'
+  children: KonpoInlineElement[]
+}
+
+export type KonpoBulletListElement = {
+  type: 'bullet-list'
+  children: KonpoListItemElement[]
+}
+
+export type KonpoBlockElement = KonpoParagraphElement | KonpoBulletListElement
 export type KonpoComposedBody = {
   content: KonpoBlockElement[]
   // TODO: add more properties if I feel the need to
