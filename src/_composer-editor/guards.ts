@@ -8,6 +8,7 @@ import type {
   KonpoText,
 } from '../types'
 import type {
+  ComposerBulletListElement,
   ComposerEditorDescendant,
   ComposerLinkElement,
   ComposerListItemElement,
@@ -36,7 +37,7 @@ export const isComposerListItem = (
 
 export const isComposerBulletList = (
   element: ComposerEditorDescendant
-): element is ComposerListItemElement =>
+): element is ComposerBulletListElement =>
   'type' in element && element.type === 'bullet-list'
 
 export const isKonpoText = (inline: KonpoInlineElement): inline is KonpoText =>
