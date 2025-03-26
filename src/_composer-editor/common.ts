@@ -13,7 +13,12 @@ import {
   SlateRange,
 } from './composer'
 
-import { isComposerParagraph, isComposerText } from './guards'
+import {
+  isComposerBulletList,
+  isComposerListItem,
+  isComposerParagraph,
+  isComposerText,
+} from './guards'
 
 // NOTE: This function is used to check if the editor is empty.
 // It may be useful to rethink this algorithm to make it more efficient.
@@ -31,6 +36,14 @@ export function isComposerEditorEmpty(
         return false
       }
     } else if (isComposerParagraph(descendant)) {
+      if (!isComposerEditorEmpty(editor, descendant.children)) {
+        return false
+      }
+    } else if (isComposerBulletList(descendant)) {
+      if (!isComposerEditorEmpty(editor, descendant.children)) {
+        return false
+      }
+    } else if (isComposerListItem(descendant)) {
       if (!isComposerEditorEmpty(editor, descendant.children)) {
         return false
       }
