@@ -1,13 +1,13 @@
 import type { ComposerEditor } from './composer'
 import {
-  SlateEditor,
-  SlateElement,
-  SlateNode,
-  SlatePath,
-  SlatePoint,
-  SlateRange,
-  SlateTransforms,
-} from './composer'
+  Editor as SlateEditor,
+  Element as SlateElement,
+  Node as SlateNode,
+  Path as SlatePath,
+  Point as SlatePoint,
+  Range as SlateRange,
+  Transforms as SlateTransforms,
+} from 'slate'
 
 export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
   const {
@@ -16,22 +16,30 @@ export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
     deleteBackward: baseDeleteBackward,
     normalizeNode: baseNormalizeNode,
   } = editor
-  editor.insertText = (text) => {
-    const selection = editor.selection
 
-    // We only want to handle the space character for the dash+space pattern
+  /**
+   * 1) InsertText override
+   *
+   *    - Converts "- " at the start of a block into a bullet list item.
+   *    - Skips if the current block is already a list item.
+   */
+  editor.insertText = (text) => {
+    const { selection } = editor
+
     if (text === ' ' && selection && SlateRange.isCollapsed(selection)) {
+      // We only trigger on exactly one space.
       const anchor = selection.anchor
-      // Get the block at the current selection
-      const block = SlateEditor.above(editor, {
+      // Get the current block above the selection.
+      const blockEntry = SlateEditor.above(editor, {
         match: (n) =>
           SlateElement.isElement(n) && SlateEditor.isBlock(editor, n),
         at: selection,
       })
 
-      if (block) {
-        const [blockElement, blockPath] = block
-        // Skip if we're already in a list item
+      if (blockEntry) {
+        const [blockElement, blockPath] = blockEntry
+
+        // If we're already in a bullet-list item, do nothing special.
         if (
           SlateElement.isElement(blockElement) &&
           blockElement.type === 'list-item'
@@ -40,29 +48,28 @@ export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
           return
         }
 
-        // Get the start point of the current block
-        const start = SlateEditor.start(editor, blockPath)
-        // Check if we're at the beginning of the line + 1 character (the dash)
+        // Where does the block start?
+        const blockStart = SlateEditor.start(editor, blockPath)
+        // Are we exactly at offset=1 from the beginning (i.e. after a single character)?
         const isAtStartPlusOne =
-          anchor.path.every((val, i) => val === start.path[i]) &&
-          anchor.offset === 1
+          SlatePath.equals(anchor.path, blockStart.path) && anchor.offset === 1
 
         if (isAtStartPlusOne) {
-          // Get the text of the current node
-          const currentNodeText = SlateNode.string(blockElement)
-          // Check if the first character is a dash
-          if (currentNodeText.startsWith('-') && currentNodeText.length === 1) {
+          // Get the text of the current block
+          const currentText = SlateNode.string(blockElement)
+          // If the block is exactly "-" so far, convert it into a bullet list with a single list-item.
+          if (currentText === '-') {
             // Delete the dash
             SlateTransforms.delete(editor, {
-              at: { anchor: start, focus: anchor },
+              at: { anchor: blockStart, focus: anchor },
             })
-            // Convert the current block to a list item
+            // Make this block a list item
             SlateTransforms.setNodes(
               editor,
               { type: 'list-item' },
               { at: blockPath }
             )
-            // Wrap in a bullet list
+            // Wrap the new list item with a bullet-list
             SlateTransforms.wrapNodes(
               editor,
               { type: 'bullet-list', children: [] },
@@ -76,66 +83,69 @@ export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
 
     baseInsertText(text)
   }
+
+  /**
+   * 2) InsertBreak override
+   *
+   *    - If ENTER is pressed in an empty list item, unwrap or remove the list item.
+   *    - Otherwise, split the list item, and ensure the new block is also a list item.
+   */
   editor.insertBreak = () => {
-    const selection = editor.selection
+    const { selection } = editor
+
     if (selection && SlateRange.isCollapsed(selection)) {
-      // Check if we're in a list item
-      const item = SlateEditor.above(editor, {
-        match: (n) =>
-          !SlateEditor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'list-item',
+      const listItemEntry = SlateEditor.above(editor, {
+        match: (n) => SlateElement.isElement(n) && n.type === 'list-item',
         at: selection,
       })
-      if (item) {
-        const [itemElement, itemPath] = item
-        // Check if the list item is empty
-        if (SlateNode.string(itemElement).length === 0) {
-          // Get the parent list
-          const [list, listPath] = SlateEditor.parent(editor, itemPath)
-          // If it's the only item in the list, replace it with a paragraph (because it's empty)
-          if (list.children.length === 1) {
-            // 1️⃣ Transform the list item to a paragraph
+
+      if (listItemEntry) {
+        const [listItem, listItemPath] = listItemEntry
+        const listItemText = SlateNode.string(listItem)
+
+        // If the list item is empty, handle unwrapping or removing it:
+        if (listItemText.length === 0) {
+          const parentListEntry = SlateEditor.parent(editor, listItemPath)
+          const [parentList, parentListPath] = parentListEntry
+
+          // If this is the only item in the list, turn it into a paragraph and unwrap
+          if (parentList.children.length === 1) {
             SlateTransforms.setNodes(
               editor,
               { type: 'paragraph' },
-              { at: itemPath }
+              { at: listItemPath }
             )
-            // 2️⃣ Unwrap the list
             SlateTransforms.unwrapNodes(editor, {
-              at: listPath,
+              at: parentListPath,
               match: (n) =>
-                !SlateEditor.isEditor(n) &&
-                SlateElement.isElement(n) &&
-                n.type === 'bullet-list',
+                SlateElement.isElement(n) && n.type === 'bullet-list',
             })
           } else {
-            // If it's not the only item, remove this empty item
-            // and insert a paragraph after the list
+            // If not the only item, remove the empty list item and insert a paragraph after this list
             const isLastItem =
-              itemPath[itemPath.length - 1] === list.children.length - 1
-            // 1️⃣ Remove the empty list item
-            SlateTransforms.removeNodes(editor, { at: itemPath })
-            // 2️⃣ Insert a paragraph after the list
-            const insertPath = isLastItem ? SlatePath.next(listPath) : listPath
+              listItemPath[listItemPath.length - 1] ===
+              parentList.children.length - 1
+
+            // Remove empty list item
+            SlateTransforms.removeNodes(editor, { at: listItemPath })
+
+            // Insert paragraph after the list if this was the last item,
+            // otherwise insert at the list path for a "break" effect
+            const insertPath = isLastItem
+              ? SlatePath.next(parentListPath)
+              : parentListPath
             SlateTransforms.insertNodes(
               editor,
               { type: 'paragraph', children: [{ text: '' }] },
-              {
-                at: insertPath,
-              }
+              { at: insertPath }
             )
           }
-
           return
         }
 
-        // For non-empty list items, insert a break and ensure the new node is a list item
-        // First, split the node at the current selection
+        // Non-empty list item: split the list item and ensure the new block is also a list item
         SlateTransforms.splitNodes(editor, { always: true })
-
-        // Then ensure the new node is a list item (it should already be at the right path)
-        const newItemPath = SlatePath.next(itemPath)
+        const newItemPath = SlatePath.next(listItemPath)
         SlateTransforms.setNodes(
           editor,
           { type: 'list-item' },
@@ -147,146 +157,141 @@ export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
 
     baseInsertBreak()
   }
+
+  /**
+   * 3) DeleteBackward override
+   *
+   *    - If backspace at the start of an empty list item, turn it into a paragraph and lift it out of the list.
+   */
   editor.deleteBackward = (unit) => {
-    const selection = editor.selection
+    const { selection } = editor
 
     if (selection && SlateRange.isCollapsed(selection)) {
-      // Check if we're in a list item
       const listItemEntry = SlateEditor.above(editor, {
-        match: (n) =>
-          !SlateEditor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'list-item',
+        match: (n) => SlateElement.isElement(n) && n.type === 'list-item',
         at: selection,
       })
 
       if (listItemEntry) {
         const [listItem, listItemPath] = listItemEntry
-        const start = SlateEditor.start(editor, listItemPath)
+        const listItemStart = SlateEditor.start(editor, listItemPath)
+        const isEmptyListItem = SlateNode.string(listItem).length === 0
+        const isCursorAtStart = SlatePoint.equals(
+          selection.anchor,
+          listItemStart
+        )
 
-        // Check if cursor is at the beginning of the list item AND the list item is empty
-        if (
-          SlatePoint.equals(selection.anchor, start) &&
-          SlateNode.string(listItem).length === 0
-        ) {
-          // Temporarily disable normalization
-          const savedNormalizeNode = editor.normalizeNode
+        // If the list item is empty and the cursor is at the start, convert to a paragraph
+        if (isCursorAtStart && isEmptyListItem) {
+          const saveNormalize = editor.normalizeNode
           editor.normalizeNode = () => {}
 
           try {
-            // Simply convert the list item to a paragraph
             SlateTransforms.setNodes(
               editor,
               { type: 'paragraph' },
               { at: listItemPath }
             )
-
-            // Lift it out of the list
             SlateTransforms.liftNodes(editor, { at: listItemPath })
           } finally {
-            // Restore normalization
-            editor.normalizeNode = savedNormalizeNode
+            editor.normalizeNode = saveNormalize
           }
-
           return
         }
       }
     }
 
-    // Default behavior for all other cases
     baseDeleteBackward(unit)
   }
 
+  /**
+   * 4) normalizeNode override
+   *
+   *    - Ensure all 'list-item' types are wrapped in 'bullet-list'.
+   *    - Ensure 'bullet-list' only contains 'list-item' elements.
+   *    - Merge adjacent bullet-lists.
+   *    - Remove or unwrap invalid or empty list-items.
+   *    - Prevent nested list items from living directly inside other list items.
+   *
+   *    This ensures the editor’s structure remains valid.
+   */
   editor.normalizeNode = ([node, path]) => {
-    // Only normalize Elements, not Text nodes
     if (SlateElement.isElement(node)) {
-      // Case 1: Ensure list items are always inside a bulleted-list
+      // Ensure list items are wrapped in a bullet-list
       if (node.type === 'list-item') {
-        const parent = SlateEditor.parent(editor, path)
-        const [parentNode] = parent
+        const parentEntry = SlateEditor.parent(editor, path)
+        const [parentNode] = parentEntry
 
         if (
           !SlateElement.isElement(parentNode) ||
-          (SlateElement.isElement(parentNode) &&
-            parentNode.type !== 'bullet-list')
+          parentNode.type !== 'bullet-list'
         ) {
-          // Wrap the list item in a bulleted list
           SlateTransforms.wrapNodes(
             editor,
             { type: 'bullet-list', children: [] },
             { at: path }
           )
-          return // Return early to avoid multiple normalizations at once
+          return
         }
       }
 
-      // Case 2: Ensure bulleted-lists only contain list-items
+      // Ensure that bullet-lists only contain list-items
       if (node.type === 'bullet-list') {
-        // Check if the list has any children
         if (node.children.length === 0) {
-          // Remove empty lists
+          // Remove empty bullet-list
           SlateTransforms.removeNodes(editor, { at: path })
           return
         }
 
-        // Check each child of the list
+        // Force all children to be 'list-item'
         for (const [child, childPath] of SlateNode.children(editor, path)) {
           if (!SlateElement.isElement(child) || child.type !== 'list-item') {
-            // Convert non-list-items to list-items
             SlateTransforms.setNodes(
               editor,
               { type: 'list-item' },
               { at: childPath }
             )
-            return // Return early to avoid multiple normalizations at once
+            return
           }
         }
 
-        // Case 3: Merge adjacent bulleted lists
-        const next = SlateEditor.next(editor, { at: path })
-        if (next) {
-          const [nextNode, nextPath] = next
-
+        // Merge adjacent bullet-lists
+        const nextEntry = SlateEditor.next(editor, { at: path })
+        if (nextEntry) {
+          const [nextNode, nextPath] = nextEntry
           if (
             SlateElement.isElement(nextNode) &&
             nextNode.type === 'bullet-list'
           ) {
-            // Merge the two lists
             SlateTransforms.mergeNodes(editor, { at: nextPath })
             return
           }
         }
       }
 
-      // Case 4: Handle invalid list items (empty ones that aren't being edited)
+      // Remove empty, unselected list-items (avoid leaving in the doc)
       if (node.type === 'list-item') {
-        // Check if the list item has any content or is currently selected
         const isEmpty = SlateNode.string(node).length === 0
         const isSelected =
           editor.selection &&
-          SlatePath.isDescendant(editor.selection.anchor.path, path)
+          SlateRange.isCollapsed(editor.selection) &&
+          SlatePath.isAncestor(path, editor.selection.anchor.path)
 
         if (isEmpty && !isSelected) {
-          // Find the parent list
-          const [list, listPath] = SlateEditor.parent(editor, path)
-
-          // If this is the only item in the list, remove the entire list
-          if (list.children.length === 1) {
-            SlateTransforms.removeNodes(editor, { at: listPath })
+          const [parentList, parentListPath] = SlateEditor.parent(editor, path)
+          // If it's the only item, remove the entire bullet-list
+          if (parentList.children.length === 1) {
+            SlateTransforms.removeNodes(editor, { at: parentListPath })
           } else {
-            // Otherwise, just remove this empty item
+            // Otherwise, remove just this empty item
             SlateTransforms.removeNodes(editor, { at: path })
           }
           return
         }
-      }
 
-      // Case 5: Handle nested list items
-      if (node.type === 'list-item') {
-        // Check if any children are list items
+        // Lift nested list items
         for (const [child, childPath] of SlateNode.children(editor, path)) {
           if (SlateElement.isElement(child) && child.type === 'list-item') {
-            // Lift the nested list item up to be a sibling
             SlateTransforms.liftNodes(editor, { at: childPath })
             return
           }
@@ -294,7 +299,7 @@ export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
       }
     }
 
-    // Continue with the original normalization
+    // Continue with default normalization
     baseNormalizeNode([node, path])
   }
 
