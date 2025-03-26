@@ -44,7 +44,7 @@ export function isComposerEditorEmpty(
         return false
       }
     } else if (isComposerListItem(descendant)) {
-      if (!isComposerEditorEmpty(editor, descendant.children)) {
+      if (descendant.children.length <= 0) {
         return false
       }
     } else {
