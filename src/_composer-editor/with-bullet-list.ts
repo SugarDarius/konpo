@@ -1,13 +1,13 @@
 import type { ComposerEditor } from './composer'
 import {
-  Editor as SlateEditor,
-  Element as SlateElement,
-  Node as SlateNode,
-  Path as SlatePath,
-  Point as SlatePoint,
-  Range as SlateRange,
-  Transforms as SlateTransforms,
-} from 'slate'
+  SlateEditor,
+  SlateElement,
+  SlateNode,
+  SlatePath,
+  SlatePoint,
+  SlateRange,
+  SlateTransforms,
+} from './composer'
 
 export const withBulletList = (editor: ComposerEditor): ComposerEditor => {
   const {
