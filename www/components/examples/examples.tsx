@@ -20,7 +20,7 @@ export function Examples() {
                 }}
               />
               <Composer.FloatingToolbar>
-                <Composer.ToggleMarkTrigger>
+                <Composer.ToggleMarkTrigger mark='bold'>
                   <BoldIcon />
                 </Composer.ToggleMarkTrigger>
               </Composer.FloatingToolbar>
