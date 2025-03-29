@@ -48,8 +48,8 @@
     "format": "prettier --write src/"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
