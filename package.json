@@ -62,7 +62,7 @@
     "tsup": "^8.4.0",
     "turbo": "^2.4.4",
     "typescript": "^5.8.2",
-    "typescript-eslint": "^8.27.0"
+    "typescript-eslint": "^8.29.0"
   },
   "dependencies": {
     "@radix-ui/react-portal": "^1.1.4",
