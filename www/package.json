@@ -16,7 +16,7 @@
     "dedent": "^1.5.3",
     "konpo": "file:..",
     "lucide-react": "^0.487.0",
-    "motion": "^12.6.3",
+    "motion": "^12.6.5",
     "next": "^15.2.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
